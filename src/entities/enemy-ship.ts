@@ -580,7 +580,7 @@ export class EnemyShip extends Entity {
         this.x,
         this.y,
         PowerUpType.SHIELD,
-        this.verticalSpeed, // Match the enemy's vertical speed (was half speed)
+        this.verticalSpeed * 2, // Twice the enemy's vertical speed (was matching speed)
         this.screenHeight
       );
       

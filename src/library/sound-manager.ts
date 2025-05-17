@@ -183,8 +183,8 @@ export class SoundManager {
       // UI select sound - using computerNoise
       { key: SoundType.UI_SELECT, path: 'assets/audio/computerNoise_002.ogg', volume: 0.5, loop: false },
       
-      // Shield activation sound - using powerUp
-      { key: SoundType.SHIELD_ACTIVATE, path: 'assets/audio/powerUp_001.ogg', volume: 0.6, loop: false }
+      // Shield activation sound - using doorClose instead of powerUp
+      { key: SoundType.SHIELD_ACTIVATE, path: 'assets/audio/doorClose_002.ogg', volume: 0.6, loop: false }
     ];
 
     try {

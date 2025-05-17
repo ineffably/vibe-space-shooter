@@ -59,8 +59,8 @@ class PowerUpCollectedState implements State {
   public enter(_owner: StateMachine): void {
     this.collectionTimer = 0;
     
-    // Play collection sound - we'll use UI select for now
-    SoundManager.getInstance().play(SoundType.UI_SELECT);
+    // Play shield activation sound instead of UI select
+    SoundManager.getInstance().play(SoundType.SHIELD_ACTIVATE);
   }
   
   public update(owner: StateMachine, deltaTime: number): void {

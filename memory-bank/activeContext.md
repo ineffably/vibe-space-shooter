@@ -2,57 +2,70 @@
 
 ## Current Work Focus
 
-We have successfully implemented the core game architecture and the player ship with movement and state-based behavior. The player ship can move around the screen using arrow keys and shoot (currently just console logging). We now need to implement the projectile system and enemy ships.
+We have implemented enemy ships, collision detection, scoring system, and game over functionality. The game now has a complete gameplay loop where players can shoot enemies, earn points, lose lives when hit, and restart when the game is over. We recently fixed critical issues with texture loading from spritesheets, enemy ship spawning, and projectile positioning. We need to focus on adding visual polish and sound effects to enhance the game experience.
 
 ## Recent Changes
 
-- Fixed Pixi.js v8.9 initialization issues with app.init() and canvas handling
-- Simplified asset loading for now to focus on core gameplay
-- Implemented player ship entity with:
-  - Movement using arrow keys
-  - Shooting with space bar (placeholder)
-  - State machine for different behaviors (idle, moving, shooting, damaged, destroyed)
-  - Health and lives system
-  - Screen boundary constraints
+- Fixed critical asset loading issues:
+  - Implemented proper XML spritesheet parsing in AssetLoader
+  - Added detailed texture extraction from spritesheet frames
+  - Fixed debugging to report available textures for troubleshooting
+- Fixed enemy ship and projectile issues:
+  - Corrected enemy ship textures to display properly
+  - Fixed projectile positioning to fire from correct ship locations
+  - Ensured enemies spawn and appear correctly on screen
+- Implemented enemy ship system:
+  - Created an EnemyShip entity with state machine
+  - Added different enemy types with random selection
+  - Implemented enemy spawning with increasing frequency
+  - Added enemy movement patterns and ability to shoot at player
+- Added collision detection:
+  - Implemented circle-based collision between projectiles and ships
+  - Applied damage to ships on collision
+  - Implemented explosion states when entities are destroyed
+- Added scoring and game over system:
+  - Track and display player score when destroying enemies
+  - Implement player lives system with visual display
+  - Added game over screen when all lives are lost
+  - Implemented game restart functionality
 
 ## Next Steps
 
-1. **Projectile System**
-   - Create a Projectile entity class
-   - Implement player projectiles that shoot upward
-   - Add object pooling for performance
-   - Create visual representation for projectiles
+1. **Visual Effects**
+   - Implement proper explosion animations for ships
+   - Add visual feedback for damage
+   - Create scrolling star background for depth and motion
+   - Add screen shake on significant events
 
-2. **Enemy Implementation**
-   - Create enemy ship class with different types
-   - Implement enemy movement patterns
-   - Add enemy shooting behavior
-   - Create enemy spawning system with increasing difficulty
+2. **Sound Effects**
+   - Add sound for shooting
+   - Add sound for explosions
+   - Add sound for taking damage
+   - Add game over and restart sounds
 
-3. **Collision System**
-   - Implement collision detection between entities
-   - Handle projectile-ship collisions
-   - Create explosion effects on collision
-   - Apply damage on collision
-
-4. **UI and Scoring**
-   - Add score display in the top-left corner
-   - Show player lives remaining
-   - Create game over screen
-   - Implement game restart functionality
+3. **Polish and Refinement**
+   - Improve collision detection with proper hitboxes
+   - Add difficulty progression
+   - Add power-ups or bonuses
+   - Add title screen and instructions
 
 ## Active Decisions
 
-- We're using a state machine for entity behaviors to allow for complex interactions and easy extension
-- Object pooling will be important for projectiles to avoid performance issues with frequent creation/destruction
-- The player ship uses a component-based model with a container and sprite
-- We'll need to implement proper collision detection that's efficient for the number of entities
-- For now, we're using simple placeholder graphics until we implement proper asset loading
+- Using simple circle-based collision detection for now
+- Keeping visual effects minimal until core gameplay is solid
+- Using state machines for all entity behaviors
+- Managing projectiles through the owner entities for better organization
+- Using a unified update loop through the scene hierarchy
+- Creating individual textures from spritesheets by parsing XML frame data
+- Ensuring projectiles spawn from the correct position on ships
 
 ## Learnings and Insights
 
-- Pixi.js v8.9 requires explicit async initialization with app.init() before accessing the canvas
-- The state machine pattern makes it easy to manage different entity behaviors and transitions
-- TypeScript's type system helps ensure consistent interfaces between components
-- The component-based approach with containers and sprites provides good flexibility
-- Protected properties in the base Entity class help enforce proper access patterns through public methods 
+- State machines make entity behavior management much cleaner
+- Object pooling is essential for performance with many projectiles
+- Hierarchical scene organization makes adding/removing elements easy
+- Keeping game state in dedicated components makes restart functionality simpler
+- TypeScript's type system helps catch errors early when refactoring
+- Pixi.js v8.9 requires careful handling of spritesheet textures and frame rectangles
+- Proper debugging of texture loading is crucial for troubleshooting rendering issues
+- Positioning projectiles relative to their parent entity requires accounting for sprite anchor points 

@@ -3,6 +3,7 @@ import { Entity } from './entity';
 import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
 import { InputManager } from '../core/input-manager';
+import { Projectile, ProjectilePool, ProjectileType } from './projectile';
 
 /**
  * Player states
@@ -265,14 +266,35 @@ export class PlayerShip extends Entity {
    * Score
    */
   private score: number = 0;
+  
+  /**
+   * Projectile pool
+   */
+  private projectilePool: ProjectilePool;
+
+  /**
+   * Screen dimensions
+   */
+  private screenWidth: number;
+  private screenHeight: number;
+
+  /**
+   * Game over callback
+   */
+  private gameOverCallback: (() => void) | null = null;
 
   /**
    * Constructor
    * @param x Initial x position
    * @param y Initial y position
+   * @param screenWidth Screen width
+   * @param screenHeight Screen height
    */
-  constructor(x: number, y: number) {
+  constructor(x: number, y: number, screenWidth: number = 800, screenHeight: number = 600) {
     super(x, y);
+    
+    this.screenWidth = screenWidth;
+    this.screenHeight = screenHeight;
 
     // Set the sprite
     this.setSprite(Texture.WHITE); // Placeholder
@@ -281,6 +303,16 @@ export class PlayerShip extends Entity {
       this.sprite.height = 60;
       this.sprite.tint = 0x0000FF; // Blue
     }
+    
+    // Create projectile pool
+    this.projectilePool = new ProjectilePool(
+      10, // Initial pool size
+      ProjectileType.PLAYER,
+      this.damage,
+      -10, // Negative velocity for upward movement
+      screenWidth,
+      screenHeight
+    );
   }
 
   /**
@@ -307,6 +339,9 @@ export class PlayerShip extends Entity {
 
     // Ensure player stays within screen bounds
     this.constrainToScreen();
+
+    // Update projectiles
+    this.projectilePool.update(deltaTime);
   }
 
   /**
@@ -332,23 +367,21 @@ export class PlayerShip extends Entity {
    * Constrain player to screen bounds
    */
   private constrainToScreen(): void {
-    const screenWidth = 800; // Placeholder, should get from game
-    const screenHeight = 600; // Placeholder, should get from game
     const halfWidth = this.width / 2;
     const halfHeight = this.height / 2;
 
     // Constrain x position
     if (this.x < halfWidth) {
       this.x = halfWidth;
-    } else if (this.x > screenWidth - halfWidth) {
-      this.x = screenWidth - halfWidth;
+    } else if (this.x > this.screenWidth - halfWidth) {
+      this.x = this.screenWidth - halfWidth;
     }
 
     // Constrain y position
     if (this.y < halfHeight) {
       this.y = halfHeight;
-    } else if (this.y > screenHeight - halfHeight) {
-      this.y = screenHeight - halfHeight;
+    } else if (this.y > this.screenHeight - halfHeight) {
+      this.y = this.screenHeight - halfHeight;
     }
 
     // Update container position
@@ -359,8 +392,25 @@ export class PlayerShip extends Entity {
    * Shoot a projectile
    */
   public shoot(): void {
+    // Get a projectile from the pool
+    const projectile = this.projectilePool.getProjectile();
+    
+    // Fire from the top center of the player
+    projectile.fire(this.x, this.y - this.height / 2);
+    
+    // Add projectile container to the scene
+    if (this.container.parent && !projectile.getContainer().parent) {
+      this.container.parent.addChild(projectile.getContainer());
+    }
+    
     console.log('Player shoots!');
-    // Projectile creation will be implemented later
+  }
+
+  /**
+   * Get active projectiles
+   */
+  public getActiveProjectiles(): Projectile[] {
+    return this.projectilePool.getActiveProjectiles();
   }
 
   /**
@@ -407,7 +457,7 @@ export class PlayerShip extends Entity {
       this.health = this.maxHealth;
 
       // Reset position
-      this.setPosition(400, 500); // Placeholder values
+      this.setPosition(this.screenWidth / 2, this.screenHeight / 2); // Placeholder values
 
       // Transition to idle state
       this.stateMachine.setState(PlayerState.IDLE);
@@ -421,7 +471,19 @@ export class PlayerShip extends Entity {
    */
   private gameOver(): void {
     console.log('Game over!');
-    // Game over logic will be implemented later
+    
+    // Call game over callback if set
+    if (this.gameOverCallback) {
+      this.gameOverCallback();
+    }
+  }
+
+  /**
+   * Set game over callback
+   * @param callback Function to call when game is over
+   */
+  public setGameOverCallback(callback: () => void): void {
+    this.gameOverCallback = callback;
   }
 
   /**
@@ -445,5 +507,15 @@ export class PlayerShip extends Entity {
    */
   public getLives(): number {
     return this.lives;
+  }
+
+  /**
+   * Set screen dimensions
+   * @param width Screen width
+   * @param height Screen height
+   */
+  public setScreenDimensions(width: number, height: number): void {
+    this.screenWidth = width;
+    this.screenHeight = height;
   }
 } 

@@ -1,4 +1,4 @@
-import { Assets, Spritesheet, Texture } from 'pixi.js';
+import { Assets, Rectangle, Texture } from 'pixi.js';
 
 /**
  * Asset types
@@ -10,12 +10,26 @@ export enum AssetType {
 }
 
 /**
+ * Asset manifests
+ */
+const ASSET_MANIFESTS = {
+  spritesheets: [
+    { name: 'space-shooter', imageUrl: 'assets/spritesheet/sheet.png', xmlUrl: 'assets/spritesheet/sheet.xml' }
+  ],
+  textures: [
+    { name: 'black', url: 'assets/backgrounds/black.png' }
+  ]
+};
+
+/**
  * Asset loader class for loading game assets
  */
 export class AssetLoader {
   private static instance: AssetLoader;
   private loaded = false;
   private loadPromise: Promise<void> | null = null;
+  private textures: Map<string, Texture> = new Map();
+  private loadingDebug = true;
 
   private constructor() {
     // Private constructor to enforce singleton
@@ -41,10 +55,80 @@ export class AssetLoader {
 
     this.loadPromise = new Promise<void>(async (resolve) => {
       try {
-        // For now, just set loaded to true as we're not loading actual assets yet
-        // Later we'll implement proper asset loading
-        console.log('Asset loading skipped for now');
+        console.log('Loading assets...');
+        
+        // Load individual textures
+        for (const tex of ASSET_MANIFESTS.textures) {
+          try {
+            const texture = await Assets.load(tex.url);
+            this.textures.set(tex.name, texture);
+            console.log(`Loaded texture: ${tex.name}`);
+          } catch (e) {
+            console.error(`Failed to load texture: ${tex.name}`, e);
+            this.textures.set(tex.name, Texture.WHITE);
+          }
+        }
+
+        // Load spritesheets (with XML definitions)
+        for (const sheet of ASSET_MANIFESTS.spritesheets) {
+          try {
+            console.log(`Loading spritesheet: ${sheet.name}`);
+            
+            // Load the spritesheet image as a base texture
+            const baseTextureAsset = await Assets.load(sheet.imageUrl);
+            
+            if (this.loadingDebug) {
+              console.log(`Loaded base texture: ${sheet.imageUrl}`, 
+                `width: ${baseTextureAsset.width}, height: ${baseTextureAsset.height}`);
+            }
+            
+            // Load the XML file
+            const xmlResponse = await fetch(sheet.xmlUrl);
+            const xmlText = await xmlResponse.text();
+            
+            if (this.loadingDebug) {
+              console.log(`Loaded XML: ${sheet.xmlUrl}`);
+            }
+            
+            // Parse the XML to get frame data
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlText, 'text/xml');
+            
+            // Process each SubTexture element
+            const subtextures = xml.getElementsByTagName('SubTexture');
+            console.log(`Found ${subtextures.length} subtextures in spritesheet`);
+            
+            for (let i = 0; i < subtextures.length; i++) {
+              const subtexture = subtextures[i];
+              const name = subtexture.getAttribute('name')?.replace('.png', '') || '';
+              const x = parseInt(subtexture.getAttribute('x') || '0', 10);
+              const y = parseInt(subtexture.getAttribute('y') || '0', 10);
+              const width = parseInt(subtexture.getAttribute('width') || '0', 10);
+              const height = parseInt(subtexture.getAttribute('height') || '0', 10);
+              
+              // Create a texture with the frame information
+              const frameRect = new Rectangle(x, y, width, height);
+              const texture = new Texture(baseTextureAsset, frameRect);
+              
+              // Store the texture with its frame name
+              this.textures.set(name, texture);
+              
+              if (this.loadingDebug && i < 5) {
+                console.log(`Created texture for frame: ${name}`, 
+                  `x: ${x}, y: ${y}, w: ${width}, h: ${height}`);
+              }
+            }
+            
+            console.log(`Loaded spritesheet: ${sheet.name} with ${subtextures.length} frames`);
+            
+          } catch (e) {
+            console.error(`Failed to load spritesheet: ${sheet.name}`, e);
+          }
+        }
+
         this.loaded = true;
+        console.log('All assets loaded');
+        console.log('Available textures:', this.listTextures());
         resolve();
       } catch (error) {
         console.error('Error loading assets:', error);
@@ -61,21 +145,17 @@ export class AssetLoader {
    */
   public getTexture(name: string): Texture {
     if (!this.loaded) {
-      throw new Error('Assets not loaded');
+      console.warn('Assets not loaded, returning placeholder texture');
+      return Texture.WHITE;
     }
-    // For now, return a white texture
-    return Texture.WHITE;
-  }
-
-  /**
-   * Get a spritesheet by name
-   * @param name Spritesheet name
-   */
-  public getSpritesheet(name: string): Spritesheet {
-    if (!this.loaded) {
-      throw new Error('Assets not loaded');
+    
+    const texture = this.textures.get(name);
+    if (!texture) {
+      console.warn(`Texture "${name}" not found, using placeholder. Available textures: ${this.listTextures()}`);
+      return Texture.WHITE;
     }
-    throw new Error(`Spritesheet ${name} not found`);
+    
+    return texture;
   }
 
   /**
@@ -83,5 +163,12 @@ export class AssetLoader {
    */
   public isLoaded(): boolean {
     return this.loaded;
+  }
+
+  /**
+   * List all available texture names
+   */
+  public listTextures(): string[] {
+    return Array.from(this.textures.keys());
   }
 } 

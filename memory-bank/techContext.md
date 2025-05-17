@@ -36,12 +36,15 @@ pixi-space-shooter/
 ├── assets/                # Game assets (sprites, audio, etc.)
 │   ├── backgrounds/       # Background images
 │   ├── spritesheets/      # Sprite sheets for animations
+│   │   ├── sheet.png      # Combined image of all sprites
+│   │   └── sheet.xml      # XML definition of frame coordinates
 │   └── audio/             # Sound effects and music
 ├── src/                   # Source code
 │   ├── core/              # Core game engine components
 │   ├── entities/          # Game entities (player, enemies, projectiles)
 │   ├── states/            # State machine implementation
 │   ├── library/           # Utility functions and helper classes
+│   │   └── asset-loader.ts # Asset loading system with spritesheet parsing
 │   ├── scenes/            # Game scenes (menu, game, game over)
 │   ├── ui/                # User interface components
 │   └── main.ts            # Entry point
@@ -78,6 +81,20 @@ pixi-space-shooter/
 - Understand the coordinate system (0,0 at top-left)
 - Be mindful of texture orientation when loading
 - Use sprite batching when appropriate
+- When working with spritesheets:
+  - Load the base spritesheet image as a texture
+  - Parse the XML definition to extract frame data
+  - Create individual textures with appropriate frame rectangles
+  - Store textures in a map for lookup by name
+  - Use texture.frame to set the visible portion of a texture
+  - Ensure proper positioning by setting sprite anchor points
+
+### Texture Handling in Pixi.js v8.9
+- Rectangle for texture frame: `new Rectangle(x, y, width, height)`
+- Creating textured sprites from spritesheet frames
+- Texture cache management for efficient reuse
+- Proper debugging of texture loading and application
+- Handling position and origin with sprite anchors
 
 ### TypeScript Usage
 - Define interfaces for all major components

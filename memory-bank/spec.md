@@ -1,8 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: true
----
 # Space Shooter
 
 ## Summary
@@ -29,7 +24,7 @@ Building and Hosting
 - This will be hosted on github pages, so an index.html at the root would help with that
 
 Developing
-- Use the Vite for the development environemtn with the appropriate typescript template
+- Use the Vite TS cli to initialize the repo
 
 Language
 - Use Typescript as the programming language
@@ -59,7 +54,7 @@ The spritesheet has the following textures that should be used as the visible ga
 The spritesheet assets are assigned as follows...
 
 | Purpose  | Texture |
-| ------------- |:-------------:|
+| ---- |:----:|
 | Player Ship      | playerShip1_blue     |
 | Enemy 1      | enemyRed1     |
 | Enemy 2      | enemyRed2     |
@@ -87,9 +82,4 @@ the enemies come into the screen from the top
 they are randomized between the ones I listed for the assets as enemy 1, 2, and 3
 they have 100 hitpoints
 they take damage applied from the projectile damage property
-they shoot down at regular intervals and randomly move right or left
-
-
-
-
-
+they shoot down at regular intervals and randomly move right or left 

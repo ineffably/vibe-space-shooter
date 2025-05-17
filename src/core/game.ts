@@ -1,0 +1,114 @@
+import { Application, Assets, Ticker } from 'pixi.js';
+import { SceneManager } from './scene-manager';
+import { GameScene } from '../scenes/game-scene';
+import { AssetLoader } from '../library/asset-loader';
+
+/**
+ * Main Game class that handles initialization and the game loop
+ */
+export class Game {
+  private app: Application;
+  private sceneManager: SceneManager = SceneManager.getInstance();
+  private assetLoader: AssetLoader = AssetLoader.getInstance();
+  private assetsPending: boolean = true;
+
+  constructor() {
+    // Create the PIXI application
+    this.app = new Application({
+      background: '#000000',
+      width: 800,
+      height: 600,
+      antialias: true
+    });
+
+    // Initialize the app first
+    this.app.init().then(() => {
+      // Add the view to the DOM
+      const gameContainer = document.getElementById('game-container');
+      if (gameContainer) {
+        gameContainer.appendChild(this.app.canvas);
+      } else {
+        console.error('Could not find game-container element');
+      }
+
+      // Add the scene manager's container to the stage
+      this.app.stage.addChild(this.sceneManager.getContainer());
+
+      // Initialize the game
+      this.init();
+
+      // Handle window resizing
+      window.addEventListener('resize', this.resize.bind(this));
+      this.resize();
+    });
+  }
+
+  /**
+   * Initialize the game
+   */
+  private async init(): Promise<void> {
+    // Load assets
+    await this.loadAssets();
+
+    // Create scenes
+    this.createScenes();
+
+    // Set up the game loop
+    this.app.ticker.add(this.update, this);
+  }
+
+  /**
+   * Load game assets
+   */
+  private async loadAssets(): Promise<void> {
+    try {
+      await this.assetLoader.loadAssets();
+      this.assetsPending = false;
+    } catch (error) {
+      console.error('Error loading assets:', error);
+    }
+  }
+
+  /**
+   * Create game scenes
+   */
+  private createScenes(): void {
+    // Create and register the game scene
+    const gameScene = new GameScene();
+    gameScene.init();
+    this.sceneManager.registerScene('game', gameScene);
+
+    // Switch to the game scene
+    this.sceneManager.switchToScene('game');
+  }
+
+  /**
+   * Main game loop
+   * @param ticker The PIXI ticker
+   */
+  private update(ticker: Ticker): void {
+    if (this.assetsPending) return;
+
+    const deltaTime = ticker.deltaTime;
+    
+    // Update the scene manager
+    this.sceneManager.update(deltaTime);
+  }
+
+  /**
+   * Handle window resizing
+   */
+  private resize(): void {
+    const gameContainer = document.getElementById('game-container');
+    if (!gameContainer) return;
+
+    const width = gameContainer.clientWidth;
+    const height = gameContainer.clientHeight;
+
+    // Resize the renderer
+    this.app.renderer.resize(width, height);
+
+    // Resize the scenes
+    this.sceneManager.resize(width, height);
+  }
+} 

@@ -31,8 +31,6 @@ export class Game {
       const gameContainer = document.getElementById('game-container');
       if (gameContainer) {
         gameContainer.appendChild(this.app.canvas);
-      } else {
-        console.error('Could not find game-container element');
       }
 
       // Add the scene manager's container to the stage
@@ -69,7 +67,7 @@ export class Game {
       await this.assetLoader.loadAssets();
       this.assetsPending = false;
     } catch (error) {
-      console.error('Error loading assets:', error);
+      // Silent error handling
     }
   }
 

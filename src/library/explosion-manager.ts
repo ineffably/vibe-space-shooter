@@ -97,11 +97,17 @@ export class ExplosionManager {
     // Start playing the animation
     explosion.play();
     
-    // Play the appropriate explosion sound
-    if (type === ExplosionType.PIXEL) {
-      SoundManager.getInstance().play(SoundType.EXPLOSION_SMALL);
-    } else {
-      SoundManager.getInstance().play(SoundType.EXPLOSION_LARGE);
+    // Get screen height (default to 800 if we can't determine it)
+    const screenHeight = 800;
+    
+    // Play sound only if the explosion is within or near the screen bounds
+    if (y > -100 && y < screenHeight + 100) {
+      // Play the appropriate explosion sound
+      if (type === ExplosionType.PIXEL) {
+        SoundManager.getInstance().play(SoundType.EXPLOSION_SMALL);
+      } else {
+        SoundManager.getInstance().play(SoundType.EXPLOSION_LARGE);
+      }
     }
     
     console.log(`Created ${type} explosion at (${x}, ${y}) with ${frames.length} frames`);

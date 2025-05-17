@@ -4,6 +4,8 @@
 
 We have implemented the core game architecture, the player ship with movement and state machine behaviors, a projectile system with object pooling, enemy ships with AI behaviors, collision detection between projectiles and ships, scoring system, and game over functionality. The game now has a functional gameplay loop with enemies that spawn at increasing frequencies, can be destroyed for points, and can damage the player. We recently fixed critical issues with texture loading and implemented proper explosions and entity textures as specified in the spec.
 
+We fixed a critical time scale issue related to how Pixi.js handles deltaTime. We discovered that in Pixi.js, deltaTime values are in frames (approximately 1 per frame at 60fps) rather than actual seconds. This was causing our player respawn timer to run much faster than intended. We've updated all state timers to use consistent frame-based counting (120 frames = 2 seconds at 60fps) to fix this issue.
+
 We have also successfully fixed a critical issue with Pixi.js v8.9 texture creation by replacing the incorrect baseTextureAsset.clone() approach with the proper Texture constructor. This issue was causing textures not to appear despite being properly loaded. We've also adjusted entity scaling and implemented the enemy system limits required by the spec (max 10 enemies, min 0.5s shooting interval, max 3 active shots per enemy).
 
 We've fixed a player ship movement issue, fine-tuning the movement speed to a balanced 3.0 value that provides responsive yet controlled movement. This involved adding debug logs to diagnose input handling and state machine transitions.
@@ -133,6 +135,22 @@ Most recently, we've implemented a robust player respawn mechanism that addresse
 
 ## Evolution of Project Decisions
 
+- Improved sound system with Howler.js:
+  - Replaced HTML5 Audio API with Howler.js for more reliable audio playback
+  - Simplified sound management with improved API and error handling
+  - Added per-sound volume controls for better audio balance
+  - Implemented better pause/stop control of sounds
+  - Eliminated console.log spam for cleaner development
+  - Added global mute/volume controls for easier audio management
+  - Implemented more robust loading with automatic error handling
+- Fixed player respawn time scale issues:
+  - Discovered that Pixi.js deltaTime is in frames (typically ~1 per frame at 60fps)
+  - Originally incorrectly assumed deltaTime values represented seconds
+  - Updated all state timers from seconds to frame-based counting (120 frames = 2 seconds at 60fps)
+  - Standardized timing approach across all player states (destroyed, invulnerable, damaged)
+  - Updated timers to be consistently commented with both frames and time equivalents
+  - Changed player respawn time from a random 3-6 seconds to a consistent 2 seconds (120 frames)
+  - Changed invulnerability period to 3 seconds (180 frames) and flash interval to ~100ms (6 frames)
 - Implemented robust player respawn mechanism:
   - Initially attempted to simply reset player position and make it active again
   - Found issues with state machine not updating during "inactive" phases

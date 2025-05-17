@@ -27,7 +27,6 @@ class PlayerIdleState implements State {
   public readonly name = PlayerState.IDLE;
 
   public enter(owner: StateMachine): void {
-    console.log('Entering player idle state');
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
@@ -41,21 +40,18 @@ class PlayerIdleState implements State {
       inputManager.isArrowLeftPressed() ||
       inputManager.isArrowRightPressed()
     ) {
-      console.log('Movement keys detected in idle state, transitioning to moving state');
       owner.setState(PlayerState.MOVING);
       return;
     }
 
     // Transition to shooting state if space is pressed
     if (inputManager.isSpacePressed()) {
-      console.log('Space key detected in idle state, transitioning to shooting state');
       owner.setState(PlayerState.SHOOTING);
       return;
     }
   }
 
   public exit(owner: StateMachine): void {
-    console.log('Exiting player idle state');
   }
 }
 
@@ -66,7 +62,6 @@ class PlayerMovingState implements State {
   public readonly name = PlayerState.MOVING;
 
   public enter(owner: StateMachine): void {
-    console.log('Entering player moving state');
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
@@ -79,24 +74,19 @@ class PlayerMovingState implements State {
 
     if (inputManager.isArrowUpPressed()) {
       dy -= player.speed * deltaTime;
-      console.log('Up key pressed, moving up', dy);
     }
     if (inputManager.isArrowDownPressed()) {
       dy += player.speed * deltaTime;
-      console.log('Down key pressed, moving down', dy);
     }
     if (inputManager.isArrowLeftPressed()) {
       dx -= player.speed * deltaTime;
-      console.log('Left key pressed, moving left', dx);
     }
     if (inputManager.isArrowRightPressed()) {
       dx += player.speed * deltaTime;
-      console.log('Right key pressed, moving right', dx);
     }
 
     // Move the player
     if (dx !== 0 || dy !== 0) {
-      console.log(`Moving player by dx=${dx}, dy=${dy}`);
       player.move(dx, dy);
     } else {
       // Transition back to idle state if no movement keys are pressed
@@ -112,7 +102,6 @@ class PlayerMovingState implements State {
   }
 
   public exit(owner: StateMachine): void {
-    console.log('Exiting player moving state');
   }
 }
 
@@ -183,7 +172,7 @@ class PlayerShootingState implements State {
 class PlayerDamagedState implements State {
   public readonly name = PlayerState.DAMAGED;
   private damageTimer = 0;
-  private readonly damageTime = 0.5; // Time in damaged state
+  private readonly damageTime = 30; // 0.5 seconds at 60fps (500ms)
 
   public enter(owner: StateMachine): void {
     const player = owner.getOwner() as PlayerShip;
@@ -214,15 +203,24 @@ class PlayerDamagedState implements State {
 class PlayerDestroyedState implements State {
   public readonly name = PlayerState.DESTROYED;
   private destroyTimer = 0;
-  private destroyTime: number = 2; // Default value, will be overridden in enter()
-  private readonly minDestroyTime = 3; // Minimum respawn time in seconds
-  private readonly maxDestroyTime = 6; // Maximum respawn time in seconds
+  private destroyTime: number = 120; // 2 seconds at 60fps (2000ms)
+  
+  // For reference: 60 frames ≈ 1 second at 60fps
+  // These values are in frames, not actual seconds (assuming deltaTime ≈ 1 at 60fps)
+  private readonly minDestroyTime = 120; // 2 seconds (2000ms)
+  private readonly maxDestroyTime = 120; // 2 seconds (2000ms)
+  private logFrequency = 0.5;
+  private lastLogTime = 0;
 
   public enter(owner: StateMachine): void {
     const player = owner.getOwner() as PlayerShip;
     
-    // Generate a random respawn time between min and max
-    this.destroyTime = this.minDestroyTime + Math.random() * (this.maxDestroyTime - this.minDestroyTime);
+    // We're now using a fixed respawn time of 2 seconds (120 frames at 60fps)
+    this.destroyTime = this.minDestroyTime;
+    
+    // Reset timers
+    this.destroyTimer = 0;
+    this.lastLogTime = 0;
     
     // Play explosion animation
     ExplosionManager.getInstance().createExplosion(
@@ -240,30 +238,15 @@ class PlayerDestroyedState implements State {
     
     // Play explosion sound
     SoundManager.getInstance().play(SoundType.EXPLOSION_LARGE);
-    
-    this.destroyTimer = 0;
-    
-    console.log(`Player ship destroyed with sonic explosion animation! Respawn in ${this.destroyTime.toFixed(1)} seconds`);
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
-    // Add this log to see what delta values we're getting
-    if (this.destroyTimer === 0) {
-      console.log(`First update after destruction, deltaTime: ${deltaTime}`);
-    }
-    
+    // deltaTime is typically "1" per frame at 60fps in Pixi.js ticker
     this.destroyTimer += deltaTime;
-    
-    // Log every 0.5 seconds for debugging
-    if (Math.floor(this.destroyTimer * 2) > Math.floor((this.destroyTimer - deltaTime) * 2)) {
-      const timeRemaining = this.destroyTime - this.destroyTimer;
-      console.log(`Respawn countdown: ${timeRemaining.toFixed(1)} seconds remaining (timer: ${this.destroyTimer.toFixed(1)}/${this.destroyTime.toFixed(1)})`);
-    }
 
-    // Trigger respawn or game over after destroy time
+    // Trigger respawn after delay (120 frames ≈ 2 seconds at 60fps)
     if (this.destroyTimer >= this.destroyTime) {
       const player = owner.getOwner() as PlayerShip;
-      console.log(`Destroy timer complete (${this.destroyTimer.toFixed(1)}s elapsed). Calling onRespawn()`);
       player.onRespawn();
     }
   }
@@ -272,7 +255,6 @@ class PlayerDestroyedState implements State {
     const player = owner.getOwner() as PlayerShip;
     player.setActive(true);
     player.setVisibility(true);
-    console.log(`Exiting destroyed state after ${this.destroyTimer.toFixed(1)}s, player is now active and visible`);
   }
 }
 
@@ -282,9 +264,9 @@ class PlayerDestroyedState implements State {
 class PlayerInvulnerableState implements State {
   public readonly name = PlayerState.INVULNERABLE;
   private invulnerableTimer = 0;
-  private readonly invulnerableDuration = 3; // Invulnerability lasts for 3 seconds
+  private readonly invulnerableDuration = 180; // 3 seconds at 60fps (3000ms)
   private flashTimer = 0;
-  private readonly flashInterval = 0.1; // Flash every 0.1 seconds
+  private readonly flashInterval = 6; // Flash every 6 frames (~100ms at 60fps)
   private isVisible = true;
 
   public enter(owner: StateMachine): void {
@@ -296,8 +278,6 @@ class PlayerInvulnerableState implements State {
     // Ensure player is active and visible at the start
     player.setActive(true);
     player.setVisibility(true);
-    
-    console.log('Player is now invulnerable for', this.invulnerableDuration, 'seconds');
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
@@ -313,11 +293,6 @@ class PlayerInvulnerableState implements State {
       this.isVisible = !this.isVisible;
       player.setVisibility(this.isVisible);
       this.flashTimer = 0;
-    }
-
-    // Log invulnerability countdown every second
-    if (Math.floor(this.invulnerableTimer) > Math.floor(this.invulnerableTimer - deltaTime)) {
-      console.log(`Invulnerability: ${Math.ceil(this.invulnerableDuration - this.invulnerableTimer)} seconds remaining`);
     }
 
     // Handle player movement during invulnerability
@@ -363,7 +338,6 @@ class PlayerInvulnerableState implements State {
   public exit(owner: StateMachine): void {
     const player = owner.getOwner() as PlayerShip;
     player.setVisibility(true);
-    console.log('Player is no longer invulnerable');
   }
 }
 
@@ -437,8 +411,6 @@ export class PlayerShip extends Entity {
 
     // Set the sprite using the correct texture from the spritesheet
     const texture = AssetLoader.getInstance().getTexture('playerShip1_blue');
-    console.log('Attempting to get playerShip1_blue texture:', texture);
-    console.log('Available textures:', AssetLoader.getInstance().listTextures());
     this.setSprite(texture);
     
     if (this.sprite) {
@@ -447,12 +419,6 @@ export class PlayerShip extends Entity {
       
       // Scale down the sprite to a more appropriate size
       this.sprite.scale.set(0.7);
-      
-      // Log for debugging
-      console.log(`Player ship created with texture: playerShip1_blue, dimensions: ${this.sprite.width}x${this.sprite.height}`);
-    } else {
-      console.error('Failed to create player ship sprite with texture: playerShip1_blue');
-      console.log('Available textures:', AssetLoader.getInstance().listTextures());
     }
     
     // Create projectile pool
@@ -470,8 +436,6 @@ export class PlayerShip extends Entity {
    * Initialize states
    */
   protected initializeStates(): void {
-    console.log('Initializing player ship states');
-    
     // Add states to the state machine
     this.stateMachine.addState(new PlayerIdleState());
     this.stateMachine.addState(new PlayerMovingState());
@@ -482,7 +446,6 @@ export class PlayerShip extends Entity {
 
     // Set initial state
     this.stateMachine.setState(PlayerState.IDLE);
-    console.log('Player initial state set to IDLE');
   }
 
   /**
@@ -490,9 +453,9 @@ export class PlayerShip extends Entity {
    * @param deltaTime Time since last update
    */
   public update(deltaTime: number): void {
-    // Call the state machine update regardless of active status
-    // This is important for states like "destroyed" which need to run while inactive
-    this.stateMachine.update(deltaTime);
+    // Call the base entity update method, which now handles state machine updates
+    // regardless of active status
+    super.update(deltaTime);
     
     // Only update active components like position constraints and projectiles when active
     if (this.active) {
@@ -565,8 +528,6 @@ export class PlayerShip extends Entity {
     
     // Play laser sound effect
     SoundManager.getInstance().play(SoundType.PLAYER_SHOOT);
-    
-    console.log('Player shoots!');
   }
 
   /**
@@ -602,7 +563,6 @@ export class PlayerShip extends Entity {
     if (this.health <= 0 || this.isInvulnerable()) return;
 
     this.health -= amount;
-    console.log(`Player takes ${amount} damage. Health: ${this.health}`);
     
     // Play damage sound
     SoundManager.getInstance().play(SoundType.PLAYER_DAMAGE);
@@ -621,7 +581,6 @@ export class PlayerShip extends Entity {
    */
   public destroy(): void {
     this.lives--;
-    console.log(`Player destroyed! Lives remaining: ${this.lives}`);
 
     // Transition to destroyed state
     this.stateMachine.setState(PlayerState.DESTROYED);
@@ -637,8 +596,6 @@ export class PlayerShip extends Entity {
    */
   public onRespawn(): void {
     if (this.lives > 0) {
-      console.log('Respawning player with', this.lives, 'lives remaining');
-      
       // Reset health
       this.health = this.maxHealth;
 
@@ -662,23 +619,13 @@ export class PlayerShip extends Entity {
       
       // Ensure container is visible and in the parent
       this.container.visible = true;
-      
-      // Ensure the container is added to its parent if it was removed
-      if (this.container.parent === null && this.container.parent !== null) {
-        console.log('Re-adding player container to scene');
-        // We need the parent reference to readd it
-      }
 
       // Transition to invulnerable state instead of idle
       try {
-        console.log('Transitioning to INVULNERABLE state');
         this.stateMachine.setState(PlayerState.INVULNERABLE);
-        console.log('Player respawned with temporary invulnerability');
       } catch (error) {
-        console.error('Error transitioning to invulnerable state:', error);
+        // Error handling silent
       }
-    } else {
-      console.log('No lives remaining, cannot respawn');
     }
   }
 
@@ -686,8 +633,6 @@ export class PlayerShip extends Entity {
    * Handle game over
    */
   private gameOver(): void {
-    console.log('Game over!');
-    
     // Play game over sound
     SoundManager.getInstance().play(SoundType.GAME_OVER);
     
@@ -711,7 +656,6 @@ export class PlayerShip extends Entity {
    */
   public addScore(points: number): void {
     this.score += points;
-    console.log(`Score: ${this.score}`);
   }
 
   /**

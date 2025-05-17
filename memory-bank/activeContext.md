@@ -18,6 +18,18 @@ Most recently, we've implemented a robust player respawn mechanism with random d
 
 ## Recent Changes
 
+- Improved sound system implementation:
+  - Replaced HTML5 Audio API with Howler.js library
+  - Created a more robust sound manager with better error handling
+  - Added per-sound volume controls for better audio balance
+  - Simplified sound loading and management
+  - Added proper sound stopping capabilities
+  - Implemented more reliable sound playback
+- Fixed time scale interpretation in player state transitions:
+  - Updated PlayerDestroyedState to use consistent 2-second (120 frames) respawn time
+  - Corrected time units from seconds to frames (at 60fps) for all state timers
+  - Fixed invulnerability duration and flash interval to use correct frame-based timing
+  - Standardized timing approach across all player states
 - Implemented robust player respawn mechanism:
   - Added random respawn delay between 3-6 seconds
   - Implemented temporary invulnerability period with visual flashing effect
@@ -134,6 +146,20 @@ Most recently, we've implemented a robust player respawn mechanism with random d
 
 ## Learnings and Insights
 
+- Sound systems in web games require robust implementation:
+  - HTML5 Audio API has limitations with multiple sound instances and mobile browser support
+  - Howler.js provides a more reliable solution for game audio needs
+  - Individual volume control for different sound types creates better audio balance
+  - Sound loading requires error handling for missing assets
+  - Each sound effect needs its own specific volume adjustment for proper balance
+  - Global mute and volume controls are essential for user experience
+- PIXI.js time scale and deltaTime require careful handling:
+  - In PIXI.js, deltaTime from the ticker is typically scaled to be ~1 per frame at 60fps
+  - This means deltaTime accumulation counts frames rather than actual seconds
+  - For a 2-second timer, you need to count to ~120 frames at 60fps
+  - Always explicitly comment time values with both frame count and time: `120 // 2 seconds at 60fps`
+  - Be consistent with time units across all state and timer logic
+  - When experiencing timing issues, verify whether frame-based or second-based counting is being used
 - The player respawn sequence requires special handling in these key areas:
   - Entity update functions need to work properly even when the entity is "inactive"
   - Using state machines for managing entity lifecycle states is effective

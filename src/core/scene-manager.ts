@@ -1,19 +1,19 @@
 import { Container } from 'pixi.js';
-import { Scene } from '../scenes/scene';
+import type { Scene } from '../scenes/scene';
 
 /**
- * Scene manager for handling different game scenes
+ * SceneManager class for managing game scenes
  */
 export class SceneManager {
   private static instance: SceneManager;
   
   /**
-   * Root container for all scenes
+   * Container for all scenes
    */
-  private container: Container;
+  private container: Container = new Container();
   
   /**
-   * Scenes by name
+   * Registered scenes
    */
   private scenes: Map<string, Scene> = new Map();
   
@@ -23,14 +23,13 @@ export class SceneManager {
   private activeScene: Scene | null = null;
   
   /**
-   * Constructor
+   * Private constructor for singleton pattern
    */
   private constructor() {
-    this.container = new Container();
   }
   
   /**
-   * Get the singleton instance
+   * Get the instance of the scene manager
    */
   public static getInstance(): SceneManager {
     if (!SceneManager.instance) {
@@ -40,35 +39,41 @@ export class SceneManager {
   }
   
   /**
+   * Get the container for all scenes
+   */
+  public getContainer(): Container {
+    return this.container;
+  }
+  
+  /**
    * Register a scene
-   * @param name Scene name
-   * @param scene Scene instance
+   * @param name Name of the scene
+   * @param scene Scene to register
    */
   public registerScene(name: string, scene: Scene): void {
     if (this.scenes.has(name)) {
-      console.warn(`Scene ${name} already registered`);
       return;
     }
     
     this.scenes.set(name, scene);
     this.container.addChild(scene.getContainer());
-    scene.deactivate();
   }
   
   /**
    * Switch to a scene
-   * @param name Scene name
+   * @param name Name of the scene to switch to
    */
   public switchToScene(name: string): void {
     if (!this.scenes.has(name)) {
-      console.error(`Scene ${name} not found`);
       return;
     }
     
+    // Deactivate current scene
     if (this.activeScene) {
       this.activeScene.deactivate();
     }
     
+    // Activate new scene
     this.activeScene = this.scenes.get(name) as Scene;
     this.activeScene.activate();
   }
@@ -84,35 +89,13 @@ export class SceneManager {
   }
   
   /**
-   * Get the scene container
-   */
-  public getContainer(): Container {
-    return this.container;
-  }
-  
-  /**
-   * Get a scene by name
-   * @param name Scene name
-   */
-  public getScene(name: string): Scene | undefined {
-    return this.scenes.get(name);
-  }
-  
-  /**
-   * Get the active scene
-   */
-  public getActiveScene(): Scene | null {
-    return this.activeScene;
-  }
-  
-  /**
    * Resize all scenes
    * @param width New width
    * @param height New height
    */
   public resize(width: number, height: number): void {
-    this.scenes.forEach((scene) => {
+    for (const scene of this.scenes.values()) {
       scene.resize(width, height);
-    });
+    }
   }
 } 

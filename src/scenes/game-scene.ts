@@ -130,6 +130,9 @@ export class GameScene extends Scene {
    * Initialize the scene
    */
   public init(): void {
+    // Set master volume to 50% (0.35 instead of default 0.7)
+    SoundManager.getInstance().setVolume(0.35);
+    
     // Create static background for base color
     this.backgroundSprite = new Sprite(AssetLoader.getInstance().getTexture('black'));
     this.backgroundSprite.width = this.screenWidth;
@@ -442,8 +445,9 @@ export class GameScene extends Scene {
       .filter(enemy => enemy.isActive() && enemy.getY() < 0)
       .map(enemy => enemy.getY());
     
-    // Start with a random position between -50 and -800
-    let y = -50 - Math.random() * 750;
+    // Start with a random position between -50 and -300 (reduced from -800)
+    // This keeps enemies closer to the screen for better gameplay experience
+    let y = -50 - Math.random() * 250;
     
     // Check if this position is too close to any existing enemy
     // If so, move it further up to maintain minimum spacing

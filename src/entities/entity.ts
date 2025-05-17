@@ -91,15 +91,14 @@ export abstract class Entity {
    * @param deltaTime The time since the last update
    */
   public update(deltaTime: number): void {
+    // Always update the state machine regardless of active status
+    // This is important for states like "destroyed" which need to run while inactive
+    this.stateMachine.update(deltaTime);
+    
+    // Other entity updates can be skipped if inactive
     if (!this.active) return;
     
-    // Log for debugging entity updates
-    if (this instanceof Object && (this.constructor as any).name === 'PlayerShip') {
-      console.log(`Updating player ship, deltaTime: ${deltaTime}`);
-    }
-    
-    // Update the state machine
-    this.stateMachine.update(deltaTime);
+    // Specific entity updates when active would go here in derived classes
   }
   
   /**

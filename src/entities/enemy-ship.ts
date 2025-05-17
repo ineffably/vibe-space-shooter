@@ -432,8 +432,12 @@ export class EnemyShip extends Entity {
       this.container.addChild(projectile.getContainer());
     }
     
-    // Play enemy laser sound effect
-    SoundManager.getInstance().play(SoundType.ENEMY_SHOOT);
+    // Only play sound if enemy is close to or within the visible screen area
+    // This prevents sounds from off-screen enemies that are far away
+    if (this.y > -100) {
+      // Play enemy laser sound effect
+      SoundManager.getInstance().play(SoundType.ENEMY_SHOOT);
+    }
     
     // Debug log
     console.log(`Enemy ${this.type} firing projectile at (${projectileX}, ${projectileY}). Active shots: ${this.activeProjectiles.length}`);

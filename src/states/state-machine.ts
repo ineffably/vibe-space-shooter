@@ -68,7 +68,6 @@ export class StateMachine {
    */
   public setState(stateName: string): void {
     if (!this.states.has(stateName)) {
-      console.error(`State ${stateName} not found in state machine`);
       return;
     }
     

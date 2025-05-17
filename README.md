@@ -2,10 +2,11 @@
 
 **Blast off into an epic space adventure!** This action-packed top-down shooter brings the classic arcade experience to your browser with stunning visuals and heart-pounding gameplay!
 
-## 📸 Game Screenshots
+## 🎮 [Play the Game Now!](https://ineffably.github.io/vibe-space-shooter/)
 
-<img height="400" alt="Gameplay Screenshot: enemy ships shooting at player" src="images/screenshot1.png" />
-<img height="400" alt="Gameplay Screenshot: enemy ships shooting at exploding player" src="images/screenshot2.png" />
+**[Click here to play instantly in your browser](https://ineffably.github.io/vibe-space-shooter/)**
+
+No installation needed - just blast off and enjoy the action!
 
 ## ✨ Awesome Features
 
@@ -18,15 +19,33 @@
 - ✨ **Dynamic Starfield**: Cruise through a parallax star background that creates amazing depth
 - 🧠 **Smart Architecture**: Built on a clean state machine pattern for rock-solid performance
 
+## 📸 Game Screenshots
+
+<img height="400" alt="Gameplay Screenshot: enemy ships shooting at player" src="images/screenshot1.png" />
+<img height="400" alt="Gameplay Screenshot: enemy ships shooting at exploding player" src="images/screenshot2.png" />
+
 ## 🕹️ How to Play
 
+### [Play Online Now!](https://ineffably.github.io/vibe-space-shooter/)
+
+#### Game Controls
 - 🔼🔽◀️▶️ **Arrow Keys**: Navigate your ship through the cosmos
 - 🔫 **Space Bar**: Unleash your laser fury!
+
+#### Game Objective
 - 🎯 **Mission**: Survive as long as possible while destroying enemy ships
-- 💪 **Starting Lives**: 3 chances to prove your skill
-- 💓 **Ship Health**: Your vessel can withstand 100 damage points
+- 🏆 **Scoring**: Earn points for each enemy ship destroyed
+- 💪 **Challenge**: Enemy ships will appear more frequently as you progress
+
+#### Game Mechanics
+- 💪 **Starting Lives**: You begin with 3 lives
+- 💓 **Ship Health**: Your vessel can withstand 100 damage points before losing a life
+- 🛡️ **Respawn**: After losing a life, you'll respawn with temporary invulnerability
+- 💥 **Destruction**: Enemy ships explode when their health reaches zero
 - 💀 **Game Over**: When all lives are exhausted, see your final score
-- 🔄 **New Game**: Hit Space to jump back into the action after game over
+- 🔄 **New Game**: Hit Space after game over to start a new adventure
+
+**[Click here to start playing now!](https://ineffably.github.io/vibe-space-shooter/)**
 
 ## 🛠️ Development
 
@@ -59,6 +78,31 @@ npm run build:vite
 # Preview Vite build
 npm run preview
 ```
+
+#### Using the Production Build
+
+The webpack production build outputs to the `lib` directory:
+
+```bash
+npm run build
+```
+
+The compiled game can be deployed by:
+1. Uploading the entire `lib` directory to your web host
+2. Serving it via any static file server
+
+### 🌐 Deployed Version
+
+The game is deployed and playable at:
+**[https://ineffably.github.io/vibe-space-shooter/](https://ineffably.github.io/vibe-space-shooter/)**
+
+This deployed version was built using the webpack production build system, which provides:
+- Optimized asset loading
+- Minified JavaScript for faster loading
+- Efficient bundling of game resources
+- Cross-browser compatibility
+
+Try it out to experience the game without any setup required!
 
 ## 🧠 Development Process
 

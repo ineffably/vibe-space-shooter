@@ -2,7 +2,7 @@
 
 ## Current Status
 
-We have completed the initial setup of the project and implemented the core game architecture. The development server is running and we can see a blank game screen.
+We have implemented the core game architecture and the player ship entity with movement and state machine behaviors. The development server is running and we can see and control the player ship on screen.
 
 ## What Works
 
@@ -23,6 +23,12 @@ We have completed the initial setup of the project and implemented the core game
   - Input handling system
   - Asset loading structure
   - Base entity class
+- Player ship implementation:
+  - Player movement with arrow keys
+  - State machine with idle, moving, shooting, damaged, and destroyed states
+  - Health and lives system
+  - Basic shooting functionality (console logging only)
+  - Screen boundary constraints
 
 ## What's Left to Build
 
@@ -39,10 +45,10 @@ We have completed the initial setup of the project and implemented the core game
 - [x] Create input handling system
 
 ### Phase 3: Game Entities
-- [ ] Implement player ship with movement and shooting
-- [ ] Create finite state machine implementations for entity behaviors
-- [ ] Implement enemy ships with AI behavior
+- [x] Implement player ship with movement
+- [x] Create finite state machine implementations for entity behaviors
 - [ ] Implement projectile system
+- [ ] Implement enemy ships with AI behavior
 - [ ] Create background star system
 
 ### Phase 4: Game Mechanics
@@ -61,11 +67,13 @@ We have completed the initial setup of the project and implemented the core game
 
 ## Known Issues
 
-- Need to check if assets are loading correctly
-- Need to implement actual game entities
+- Asset loading is currently stubbed out - we're using placeholder graphics
+- Fixed screen size values in player ship - these should be made dynamic
+- Hidden/placeholder functions for spawning projectiles
 
 ## Evolution of Project Decisions
 
-- Implemented the core architecture using singleton pattern for managers (SceneManager, InputManager, AssetLoader)
-- Created a clear separation between game logic and rendering through the entity and scene system
-- Used a state machine approach for entity behaviors as specified in the requirements 
+- Fixed issues with Pixi.js v8.9 initialization by properly waiting for app.init() to complete
+- Improved entity system with protected sprite access via public methods
+- Implemented a state machine for player ship behaviors with 5 distinct states
+- Switched from a complex asset loading system to a simplified solution for now 

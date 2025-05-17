@@ -1,0 +1,84 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Space Shooter
+
+## Summary
+
+This is a simple top down space shooter where the player ship is on the bottom of the screen pointing up and with the stars moving as the background.
+The enemy ships start showing up coming into from the the top of the screen. they are sparse at first but increase slightly with frequency over time.
+The player's ship should be able to shoot a laser at the enemy ships as they move down towards the bottom of the screen.
+The enemy ships have health points and the lasers take away health and when the enemy ships reach zero they explode.
+when the enemy ships explode the player gets a number of points which is added to their score. 
+The enemy ships can also shoot at the player after they enter the frame or screen. Since they are alway spointing and traveling down, their lasers shoot down. 
+When a laser hits an enemy ship, there is an explosion and an explosion sound.
+The player has hit points and when the player reaches zero hit points their ship explodes.
+When this happens, the player loses a life and then re-spawns after a time. 
+The score shows up on the screen in the top left along with how many lives they have left. 
+The background is stars and should move in the background if there were stars moving below the player. 
+the player starts with 3 lives and when they lose all 3 the game is over. 
+When the game is over it shows how long the player lasted and how many points they gained. 
+It then allows the player to restart the game. 
+
+## Technology
+
+Building and Hosting
+- Use the Vite TS cli to initialize the repo
+- This will be hosted on github pages, so an index.html at the root would help with that
+
+Developing
+- Use the Vite TS cli to initialize the repo
+
+Language
+- Use Typescript as the programming language
+
+Rendering
+- pixi 8.9 should be used to render game objects
+- The software engineer should be considered an expert at the pixi.js framework
+- The documentation is here: https://pixijs.download/release/docs/index.html
+- The codebase is here: https://github.com/pixijs/pixijs
+- Make sure that you understand the coordinate system that PIXI uses. 
+- Make sure you understand the texture orientation when they are loaded
+
+Frameworks
+- pixi.js latest: should be v8.9
+- please check for eslinting errors
+- use the eslint --fix for auto-fixing
+
+## Assets
+
+the assets exist in the assets folder and should be loaded using the PIXI asset loader.
+The spritesheet has the following textures that should be used as the visible game assets on screen. 
+The spritesheet assets are assigned as follows...
+
+| Purpose  | Texture |
+| ------------- |:-------------:|
+| Player Ship      | playerShip1_blue     |
+| Enemy 1      | enemyRed1     |
+| Enemy 2      | enemyRed2     |
+| Enemy 3      | enemyRed3     |
+| Player Laser | laserBlue01 |
+| Enemy Lasers | laserRed05 |
+| Laser explosion | spritesheet_pixelExplosion |
+| Ship explosion | spritesheet_sonicExplosion |
+
+Background Image: /assets/backgrounds/black.png
+
+## Player
+
+The player is the ship they control 
+The player ship movment uses the arrow keys for left/right and up/down
+The player score is persistently shown in the top left along with the number of lives left
+the player score starts at zero and increases with each enemy destroyed
+When the player is destroyed the Ship explosion should be shown and animated
+An explosion sound should play.
+
+
+
+
+
+
+
+

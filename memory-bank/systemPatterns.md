@@ -5,6 +5,36 @@
 ### Game Loop
 The game will use Pixi.js's built-in ticker to handle the main game loop, which manages updates to game state and rendering. This provides a consistent frame rate and synchronizes game updates.
 
+### SideQuest Framework
+We've created a reusable game framework called SideQuest that has been extracted from the main game code. This framework exists as a sibling to the src directory and provides core functionality for any 2D game:
+
+1. **Core Components**:
+   - Game: Main class that initializes the game loop and manages scenes
+   - Scene/SceneManager: Classes for organizing game screens and transitions
+   - Entity: Base class for all game objects
+   - StateMachine: Generic state machine for entity behaviors
+
+2. **Manager Components**:
+   - AssetManager: Handles asset loading, caching, and texture management
+   - InputManager: Processes keyboard and mouse input
+
+3. **Utility Components**:
+   - ObjectPool: System for object recycling to improve performance
+
+The SideQuest framework is designed to be reusable across different projects and provides a solid foundation for building 2D games with Pixi.js.
+
+### Game-Specific Architecture
+The game itself uses the SideQuest framework and implements specific game logic for the space shooter:
+
+1. **Game-Specific Components**:
+   - Player Ship: Handles player input, movement, shooting, and health
+   - Enemy Ships: Manages AI behavior, movement patterns, and shooting
+   - Projectiles: Handles projectile movement and collision detection
+   - Explosion Manager: Controls explosion animations for different types
+   - Star Background: Creates scrolling star effect for depth and motion
+   - Sound Manager: Manages audio playback for game events
+   - UI Components: Score display, lives counter, and game over screen
+
 ### Component Structure
 The game will be structured with the following key components:
 

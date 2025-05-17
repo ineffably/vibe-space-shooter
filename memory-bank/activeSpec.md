@@ -4,7 +4,7 @@
 
 This is a simple top down space shooter where the player ship is on the bottom of the screen pointing up. The game now features a scrolling star background with a parallax effect that creates the illusion of movement through space, with stars of varying sizes, speeds, and brightness moving from top to bottom.
 
-The enemy ships spawn from the top of the screen with staggered vertical positions (between -50 and -800 pixels) for more interesting entry patterns. They start sparse and increase in frequency over time. Each enemy has a different vertical speed (between 0.3 and 2.0) for unpredictable movement patterns.
+The enemy ships spawn from the top of the screen with staggered vertical positions (between -50 and -300 pixels) for more interesting entry patterns. They start sparse and increase in frequency over time. Each enemy has a different vertical speed (between 0.3 and 2.0) for unpredictable movement patterns.
 
 The player's ship can shoot lasers at the enemy ships as they move down toward the bottom of the screen.
 The enemy ships have 100 health points, and the player's lasers deal 50 damage per hit. When enemy ships reach zero health, they explode with a sonic explosion animation.
@@ -15,25 +15,49 @@ The enemy ships can shoot at the player after they enter the screen. Since they 
 When a laser hits an enemy ship or player, a pixel explosion animation plays (sonic explosion animations are used for ship destruction).
 
 The player has 100 hit points and when they reach zero, the ship explodes with a sonic explosion animation.
-When this happens, the player loses a life and respawns after a 2-second delay.
+When this happens, the player loses a life and respawns after a random 3-6 second delay with temporary invulnerability.
 The score is displayed in the top left along with the number of lives remaining.
 
 The player starts with 3 lives, and when all lives are lost, the game displays "GAME OVER" with the final score and allows the player to restart by pressing the space key.
 
 Sound effects now accompany all key game actions, including laser shooting (both player and enemy), explosions (both small for projectiles and large for ships), player damage, game over, and UI interactions. These sound effects significantly enhance the gaming experience and provide clear feedback to the player.
 
+## SideQuest Framework
+
+The project now includes a reusable game framework called "SideQuest" that has been extracted from the main game code and moved to the root level of the project. This creates a cleaner separation between game-specific code and reusable components.
+
+The SideQuest framework provides core functionality for 2D game development with Pixi.js:
+
+1. **Core Components**:
+   - Game: Main class that initializes the Pixi.js application and game loop
+   - Scene/SceneManager: Systems for organizing game screens and transitions
+   - Entity: Base class for all game objects with container handling
+   - StateMachine: Generic state machine for entity behaviors
+
+2. **Manager Components**:
+   - InputManager: Enhanced keyboard and mouse input handling
+   - AssetManager: Asset loading system with spritesheet support
+
+3. **Utility Components**:
+   - ObjectPool: Object recycling system for performance optimization
+
+The framework is designed to be modular, type-safe, and reusable for future projects.
+
 ## Technology
 
 Building and Hosting
 - Using Vite TS for project structure and build
 - Configured for GitHub Pages with proper index.html at root
+- Updated with a Vite configuration file for path aliases
 
 Development
 - Using Vite for the development environment with TypeScript template
 - ESLint configured for code quality
+- Path aliases configured in tsconfig.json for cleaner imports
 
 Language
 - Using TypeScript as the programming language
+- TypeScript generics used for type safety in the framework components
 
 Rendering
 - Pixi.js v8.9 for rendering game objects
@@ -42,30 +66,36 @@ Rendering
 - Dynamic star rendering using Pixi.js Graphics objects
 
 Audio
-- HTML5 Audio API for sound playback
+- Howler.js library for sound playback
 - Custom SoundManager singleton for centralized audio handling
-- Volume control and mute functionality
-- Clone-based approach for concurrent sound playback
+- Per-sound volume controls for better audio balance
+- Simplified sound loading and management
+- Proper sound stopping capabilities
 
 Frameworks
 - Pixi.js v8.9
+- Howler.js for audio
 - ESLint with auto-fixing capability
+- Custom SideQuest framework for game architecture
 
 ## Architecture
 
-- Implemented finite state machine for entity behaviors:
-  - Player ship has Idle, Moving, Shooting, Damaged, and Destroyed states
-  - Projectiles have Active, Exploding, and Inactive states
-  - Enemy ships have similar state patterns
-- Created reusable components:
-  - Base Entity class
-  - State Machine implementation
-  - Projectile Pooling system
-  - Explosion Manager
-  - Input Manager
-  - Asset Loader
-  - Sound Manager
+- Extracted reusable components into the SideQuest framework:
+  - Generic state machine for entity behaviors
+  - Base entity class with container handling
+  - Scene management system
+  - Input handling system
+  - Asset loading system
+  - Object pooling system
+
+- Game-specific implementations:
+  - Player ship with Idle, Moving, Shooting, Damaged, Destroyed, and Invulnerable states
+  - Projectiles with Active, Exploding, and Inactive states
+  - Enemy ships with movement and shooting patterns
+  - Explosion Manager for animation handling
   - Star Background system with parallax effect
+  - Sound Manager for audio playback
+  - UI components for score display and game over screen
 
 ## Assets
 
@@ -84,7 +114,7 @@ Successfully loaded and implemented assets from:
 - /assets/audio/game-over.mp3
 - /assets/audio/ui-select.mp3
 
-All assets are loaded using a custom PIXI asset loader implementation and sound loading system.
+All assets are loaded using the SideQuest AssetManager with support for spritesheets and sound files.
 The following textures are used as visible game assets:
 
 | Purpose  | Texture | Status |
@@ -125,7 +155,8 @@ The following sound effects are implemented:
 - Base damage per laser hit is 50
 - Player has 100 health points
 - Player has 3 lives
-- Player respawns after 2 seconds when destroyed
+- Player respawns after a random 3-6 second delay when destroyed
+- Temporary invulnerability with visual flashing effect after respawning
 - Game over when all lives are lost
 - Sound effects for shooting, taking damage, and destruction
 
@@ -133,7 +164,7 @@ The following sound effects are implemented:
 
 - Entity type: Sprite with randomized texture (enemyRed1, enemyRed2, or enemyRed3)
 - Scale: 0.6 of original texture size for better visual proportions
-- Enemies spawn at staggered positions above the screen (-50 to -800 pixels)
+- Enemies spawn at staggered positions above the screen (-50 to -300 pixels)
 - Maximum of 10 active enemies on screen at once (enforced)
 - Shooting frequency limited to minimum 0.5 seconds between shots
 - Maximum of 3 active shots per enemy (enforced)
@@ -159,10 +190,10 @@ The following sound effects are implemented:
 
 ## Sound System
 
-- Centralized SoundManager singleton class
+- Centralized SoundManager singleton class using Howler.js
 - Pre-loading of all sound assets during game initialization
-- Concurrent sound playback using cloned audio elements
-- Volume control with default level set to 0.7 (70%)
+- Concurrent sound playback with proper instance management
+- Volume control with per-sound volume adjustment
 - Mute functionality for potential future options menu
 - Different sound types for various game events:
   - Laser shooting sounds (different for player and enemy)
@@ -188,3 +219,16 @@ The following sound effects are implemented:
 | Game Over | ✓ | ✓ | Shows final score and restart instructions |
 | Moving Star Background | ✓ | ✓ | Implemented with parallax effect and varying star properties |
 | Sound Effects | ✓ | ✓ | All key sound effects implemented with volume control | 
+| Player Respawn | ✓ | ✓ | Enhanced with random delay and temporary invulnerability |
+| SideQuest Framework | ✗ | ✓ | Added reusable game framework (beyond original spec) |
+
+## Additions Beyond Original Spec
+
+| Feature | Description |
+| ---- | ---- |
+| SideQuest Framework | Extracted reusable game framework with core components, managers, and utilities |
+| Enhanced Respawn System | Random respawn delay with temporary invulnerability and visual indicator |
+| Improved Audio System | Howler.js integration with per-sound volume controls and better playback |
+| Detailed Star Background | Multi-layered parallax star background with varied star properties |
+| Type-Safe Architecture | Enhanced TypeScript usage with generics and strict typing |
+| Project Structure | Clean separation of game code and framework components | 

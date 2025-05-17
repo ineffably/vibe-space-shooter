@@ -16,8 +16,16 @@ We've implemented a complete sound system with sound effects for all key game ac
 
 Most recently, we've implemented a robust player respawn mechanism with random delay timing. When the player is destroyed, they're temporarily removed from the game with an explosion animation, and after a random delay of 3-6 seconds, they respawn with temporary invulnerability indicated by a flashing effect. This creates a meaningful consequence for being destroyed while still keeping the game engaging.
 
+We have also extracted and moved the reusable game framework "SideQuest" from inside the src directory to the root level of the project, creating a cleaner separation between the game-specific code and the reusable framework components.
+
 ## Recent Changes
 
+- Reorganized project structure by moving the SideQuest framework:
+  - Moved the `sidequest` folder from inside `src/` to the root level of the project
+  - Updated `tsconfig.json` to include both `src` and `sidequest` directories
+  - Added path aliases in `tsconfig.json` for easier imports
+  - Created a `vite.config.ts` file to set up path aliases for Vite
+  - This creates a cleaner separation between game-specific code and reusable framework
 - Improved sound system implementation:
   - Replaced HTML5 Audio API with Howler.js library
   - Created a more robust sound manager with better error handling

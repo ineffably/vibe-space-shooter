@@ -12,14 +12,20 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "sidequest": ["sidequest"],
+      "sidequest/*": ["sidequest/*"]
+    },
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "sidequest"]
 }

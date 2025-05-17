@@ -16,6 +16,8 @@ We've implemented a comprehensive sound system with sound effects for key game a
 
 Most recently, we've implemented a robust player respawn mechanism that addresses a key gameplay requirement. When the player ship is destroyed, it now waits for a random period of 3-6 seconds before respawning, creating a meaningful consequence for death while maintaining player engagement. After respawning, the player gets a temporary invulnerability period indicated by a flashing effect to prevent immediate destruction upon re-entry. This required significant enhancements to the entity update system and state machine to ensure proper operation during inactive states.
 
+We've also extracted the reusable core components of our game into a separate framework called "SideQuest" and moved it from the src directory to the root level of the project. This creates a cleaner separation between game-specific code and reusable framework components, making it easier to maintain and potentially reuse the framework for future projects.
+
 ## What Works
 
 - Memory bank documentation is complete with:
@@ -28,14 +30,15 @@ Most recently, we've implemented a robust player respawn mechanism that addresse
   - Set up project directories
   - Installed core dependencies (Pixi.js v8.9)
   - Configured ESLint
-- Core framework components:
+  - Created SideQuest framework as a separate module
+- Core framework components (SideQuest):
   - Game class with main loop
   - Scene management system
   - State machine for entity behaviors
   - Input handling system
   - Asset loading system with proper spritesheet XML parsing and texture extraction
   - Base entity class
-  - Sound manager for audio playback
+  - Object pooling system
 - Player ship implementation:
   - Proper "playerShip1_blue" texture from the spritesheet
   - Player movement with arrow keys at balanced speed (3.0)
@@ -135,6 +138,13 @@ Most recently, we've implemented a robust player respawn mechanism that addresse
 
 ## Evolution of Project Decisions
 
+- Extracted SideQuest framework from game code:
+  - Originally had game engine components mixed with game-specific code
+  - Identified reusable patterns and components that could form a separate framework
+  - Created a separate SideQuest directory structure at the root level
+  - Updated build configuration (tsconfig.json and vite.config.ts) to support the new structure
+  - Added path aliases for clean imports from the framework
+  - This separation provides a cleaner architecture and potential for framework reuse
 - Improved sound system with Howler.js:
   - Replaced HTML5 Audio API with Howler.js for more reliable audio playback
   - Simplified sound management with improved API and error handling

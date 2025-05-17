@@ -43,12 +43,26 @@ pixi-space-shooter/
 │   │   ├── spritesheet_sonicExplosion.png  # Sonic explosion animation
 │   │   └── spritesheet_sonicExplosion.xml  # Sonic explosion frame data
 │   └── audio/             # Sound effects and music
-├── src/                   # Source code
-│   ├── core/              # Core game engine components
+├── sidequest/             # Reusable game framework
+│   ├── core/              # Core framework components
+│   │   ├── game.ts        # Main game class
+│   │   ├── scene.ts       # Base scene class
+│   │   ├── scene-manager.ts # Scene management
+│   │   └── state-machine.ts # State machine implementation
+│   ├── entities/          # Base entity system
+│   │   └── entity.ts      # Base entity class
+│   ├── managers/          # Manager classes
+│   │   ├── asset-manager.ts # Asset loading and management
+│   │   └── input-manager.ts # Input handling
+│   ├── utils/             # Utility classes
+│   │   └── object-pool.ts # Object pooling system
+│   ├── index.ts           # Framework exports
+│   └── README.md          # Framework documentation
+├── src/                   # Game-specific source code
+│   ├── core/              # Game core components
 │   ├── entities/          # Game entities (player, enemies, projectiles)
-│   ├── states/            # State machine implementation
-│   ├── library/           # Utility functions and helper classes
-│   │   └── asset-loader.ts # Asset loading system with spritesheet parsing
+│   ├── states/            # Entity state implementations
+│   ├── library/           # Game-specific utility functions
 │   ├── scenes/            # Game scenes (menu, game, game over)
 │   ├── ui/                # User interface components
 │   └── main.ts            # Entry point
@@ -56,7 +70,7 @@ pixi-space-shooter/
 ├── index.html             # HTML entry point
 ├── package.json           # Project configuration
 ├── tsconfig.json          # TypeScript configuration
-└── vite.config.ts         # Vite configuration
+└── vite.config.ts         # Vite configuration with path aliases
 ```
 
 ## Technical Constraints

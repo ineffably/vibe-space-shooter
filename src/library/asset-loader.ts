@@ -106,9 +106,12 @@ export class AssetLoader {
               const width = parseInt(subtexture.getAttribute('width') || '0', 10);
               const height = parseInt(subtexture.getAttribute('height') || '0', 10);
               
-              // Create a texture with the frame information
-              const frameRect = new Rectangle(x, y, width, height);
-              const texture = new Texture(baseTextureAsset, frameRect);
+              // Create a texture with the frame information - Pixi.js v8.9 method
+              // Clone the base texture first
+              const texture = baseTextureAsset.clone();
+              
+              // Set the frame property to define the visible portion
+              texture.frame = new Rectangle(x, y, width, height);
               
               // Store the texture with its frame name
               this.textures.set(name, texture);

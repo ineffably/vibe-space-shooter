@@ -4,15 +4,22 @@ import { InputManager } from '../core/input-manager';
 import { PlayerShip } from '../entities/player-ship';
 import { EnemyShip, EnemyType } from '../entities/enemy-ship';
 import { AssetLoader } from '../library/asset-loader';
+import { StarBackground } from '../library/star-background';
+import { SoundManager, SoundType } from '../library/sound-manager';
 
 /**
  * Main gameplay scene
  */
 export class GameScene extends Scene {
   /**
-   * Background sprite
+   * Static background sprite (for base background color)
    */
-  private background: Sprite | null = null;
+  private backgroundSprite: Sprite | null = null;
+  
+  /**
+   * Star background
+   */
+  private starBackground: StarBackground | null = null;
   
   /**
    * Player ship
@@ -106,6 +113,11 @@ export class GameScene extends Scene {
   private isGameOver: boolean = false;
   
   /**
+   * Update listeners for animations
+   */
+  private updateListeners: ((deltaTime: number) => void)[] = [];
+  
+  /**
    * Constructor
    */
   constructor() {
@@ -118,11 +130,15 @@ export class GameScene extends Scene {
    * Initialize the scene
    */
   public init(): void {
-    // Create background (using actual asset)
-    this.background = new Sprite(AssetLoader.getInstance().getTexture('black'));
-    this.background.width = this.screenWidth;
-    this.background.height = this.screenHeight;
-    this.container.addChild(this.background);
+    // Create static background for base color
+    this.backgroundSprite = new Sprite(AssetLoader.getInstance().getTexture('black'));
+    this.backgroundSprite.width = this.screenWidth;
+    this.backgroundSprite.height = this.screenHeight;
+    this.container.addChild(this.backgroundSprite);
+    
+    // Create scrolling star background
+    this.starBackground = new StarBackground(this.screenWidth, this.screenHeight);
+    this.container.addChild(this.starBackground.getContainer());
     
     // Initialize game entities
     this.initializeEntities();
@@ -233,6 +249,11 @@ export class GameScene extends Scene {
       return;
     }
     
+    // Update star background
+    if (this.starBackground) {
+      this.starBackground.update(deltaTime);
+    }
+    
     // Update game time
     this.gameTime += deltaTime;
     
@@ -250,6 +271,11 @@ export class GameScene extends Scene {
     
     // Update UI
     this.updateUI();
+    
+    // Call all update listeners
+    for (const listener of this.updateListeners) {
+      listener(deltaTime);
+    }
     
     // Check for game over
     if (this.player && this.player.getLives() <= 0) {
@@ -501,6 +527,9 @@ export class GameScene extends Scene {
   private restartGame(): void {
     this.isGameOver = false;
     
+    // Play UI select sound
+    SoundManager.getInstance().play(SoundType.UI_SELECT);
+    
     // Hide game over UI
     this.gameOverContainer.visible = false;
     
@@ -510,6 +539,18 @@ export class GameScene extends Scene {
     // Reset enemy spawn timer and interval
     this.enemySpawnTimer = 0;
     this.enemySpawnInterval = 3;
+    
+    // Re-initialize star background for a fresh start
+    if (this.starBackground) {
+      // Remove existing star background
+      this.container.removeChild(this.starBackground.getContainer());
+      
+      // Create new star background
+      this.starBackground = new StarBackground(this.screenWidth, this.screenHeight);
+      
+      // Add it back to the container (between background and entities)
+      this.container.addChildAt(this.starBackground.getContainer(), 1);
+    }
     
     // Clear all enemies
     for (const enemy of this.enemies) {
@@ -547,9 +588,13 @@ export class GameScene extends Scene {
     this.screenWidth = width;
     this.screenHeight = height;
     
-    if (this.background) {
-      this.background.width = width;
-      this.background.height = height;
+    if (this.backgroundSprite) {
+      this.backgroundSprite.width = width;
+      this.backgroundSprite.height = height;
+    }
+    
+    if (this.starBackground) {
+      this.starBackground.resize(width, height);
     }
     
     // Update player's screen dimensions
@@ -573,6 +618,25 @@ export class GameScene extends Scene {
     
     if (this.restartText) {
       this.restartText.position.set(width / 2, height / 2 + 60);
+    }
+  }
+  
+  /**
+   * Add an update listener function
+   * @param listener Function to call during update
+   */
+  public addUpdateListener(listener: (deltaTime: number) => void): void {
+    this.updateListeners.push(listener);
+  }
+  
+  /**
+   * Remove an update listener function
+   * @param listener Function to remove
+   */
+  public removeUpdateListener(listener: (deltaTime: number) => void): void {
+    const index = this.updateListeners.indexOf(listener);
+    if (index !== -1) {
+      this.updateListeners.splice(index, 1);
     }
   }
 } 

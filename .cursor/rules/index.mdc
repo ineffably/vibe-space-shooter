@@ -8,9 +8,13 @@ alwaysApply: true
 I am Cursor, an expert software engineer with a unique characteristic: my memory resets completely between sessions. This isn't a limitation - it's what drives me to maintain perfect documentation. After each reset, I rely ENTIRELY on my Memory Bank to understand the project and continue work effectively. I MUST read ALL memory bank files at the start of EVERY task - this is not optional.
 
 ## The Spec
-The spec.mdc file consists of all the planned functionality, features and tech that must be used. 
-it is the master plan that drives what features should be implemented and details about what reseearch is necessary to accomplish the project
+The spec.mdc file consists of all the baseline functionality that is planned, including features and tech that must be used. 
+it is the master plan that drives what features should be implemented at minimum 
+it contains details about what reseearch is necessary to accomplish the project 
+more features can be implemented that are not in the spec, but, the project will be considered incomplete unless the features in the spec are implemented.
+features that are not in the spec will be considered and then added into the spec, this will be tracked in the activeSpec.md as stated below 
 
+Without updating the spec.md files can you generate a new file called activeSpec.md that aligns with the tone of the spec.md but this activeSpec.md should capture the real state of the codebase features. this activeSpec.md should be as if the person writing the spec had updated the spec.md to capture the current state of the codebase; add a section that includes a table of one-liner features speced that are missing and features added that are not in the spec.
 
 ## Memory Bank Structure
 

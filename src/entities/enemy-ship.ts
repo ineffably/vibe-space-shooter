@@ -1,10 +1,11 @@
-import { Sprite } from 'pixi.js';
+import { Sprite, Texture } from 'pixi.js';
 import { Entity } from './entity';
 import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
 import { AssetLoader } from '../library/asset-loader';
 import { Projectile, ProjectileType } from './projectile';
 import { ExplosionManager, ExplosionType } from '../library/explosion-manager';
+import { SoundManager, SoundType } from '../library/sound-manager';
 
 /**
  * Enum for enemy types
@@ -430,6 +431,9 @@ export class EnemyShip extends Entity {
     } else {
       this.container.addChild(projectile.getContainer());
     }
+    
+    // Play enemy laser sound effect
+    SoundManager.getInstance().play(SoundType.ENEMY_SHOOT);
     
     // Debug log
     console.log(`Enemy ${this.type} firing projectile at (${projectileX}, ${projectileY}). Active shots: ${this.activeProjectiles.length}`);

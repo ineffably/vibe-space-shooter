@@ -6,6 +6,7 @@ import { InputManager } from '../core/input-manager';
 import { Projectile, ProjectilePool, ProjectileType } from './projectile';
 import { AssetLoader } from '../library/asset-loader';
 import { ExplosionManager, ExplosionType } from '../library/explosion-manager';
+import { SoundManager, SoundType } from '../library/sound-manager';
 
 /**
  * Player states
@@ -439,6 +440,9 @@ export class PlayerShip extends Entity {
       this.container.parent.addChild(projectile.getContainer());
     }
     
+    // Play laser sound effect
+    SoundManager.getInstance().play(SoundType.PLAYER_SHOOT);
+    
     console.log('Player shoots!');
   }
 
@@ -458,6 +462,9 @@ export class PlayerShip extends Entity {
 
     this.health -= amount;
     console.log(`Player takes ${amount} damage. Health: ${this.health}`);
+    
+    // Play damage sound
+    SoundManager.getInstance().play(SoundType.PLAYER_DAMAGE);
 
     // If health reaches zero, destroy the player
     if (this.health <= 0) {
@@ -507,6 +514,9 @@ export class PlayerShip extends Entity {
    */
   private gameOver(): void {
     console.log('Game over!');
+    
+    // Play game over sound
+    SoundManager.getInstance().play(SoundType.GAME_OVER);
     
     // Call game over callback if set
     if (this.gameOverCallback) {

@@ -255,6 +255,13 @@ export class Projectile extends Entity {
   public getType(): ProjectileType {
     return this.type;
   }
+  
+  /**
+   * Deactivate the projectile
+   */
+  public deactivate(): void {
+    this.stateMachine.setState(ProjectileState.INACTIVE);
+  }
 }
 
 /**
@@ -364,5 +371,21 @@ export class ProjectilePool {
    */
   public getActiveProjectiles(): Projectile[] {
     return this.activeProjectiles;
+  }
+  
+  /**
+   * Deactivate all active projectiles
+   */
+  public deactivateAll(): void {
+    // Create a copy of the array to avoid modification during iteration
+    const projectilesToDeactivate = [...this.activeProjectiles];
+    
+    // Deactivate each projectile (which will trigger returnToPool)
+    for (const projectile of projectilesToDeactivate) {
+      projectile.deactivate();
+    }
+    
+    // Clear the active projectiles array (should be empty after deactivation)
+    this.activeProjectiles = [];
   }
 } 

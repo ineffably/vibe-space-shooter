@@ -69,8 +69,8 @@ export class GameScene extends Scene {
   /**
    * Screen dimensions
    */
-  private screenWidth: number = 800;
-  private screenHeight: number = 600;
+  private screenWidth: number = 500;
+  private screenHeight: number = 800;
   
   /**
    * UI container
@@ -164,7 +164,7 @@ export class GameScene extends Scene {
     // Create player ship
     this.player = new PlayerShip(
       this.screenWidth / 2,  // Center x position
-      this.screenHeight - 100, // Near bottom of screen
+      this.screenHeight - 120, // Near bottom of screen, but adjusted for taller layout
       this.screenWidth,
       this.screenHeight
     );
@@ -272,6 +272,9 @@ export class GameScene extends Scene {
     // Update UI
     this.updateUI();
     
+    // Ensure player is in scene
+    this.ensurePlayerInScene();
+    
     // Call all update listeners
     for (const listener of this.updateListeners) {
       listener(deltaTime);
@@ -317,7 +320,7 @@ export class GameScene extends Scene {
    * Check for collisions between entities
    */
   private checkCollisions(): void {
-    if (!this.player) return;
+    if (!this.player || !this.player.isActive()) return;
     
     // Check player projectiles against enemies
     const playerProjectiles = this.player.getActiveProjectiles();
@@ -359,6 +362,9 @@ export class GameScene extends Scene {
         }
       }
     }
+    
+    // Skip enemy projectile collisions if player is invulnerable or destroyed
+    if (this.player.isInvulnerable()) return;
     
     // Check enemy projectiles against player
     for (let i = 0; i < this.enemies.length; i++) {
@@ -566,7 +572,7 @@ export class GameScene extends Scene {
       // Create new player
       this.player = new PlayerShip(
         this.screenWidth / 2,
-        this.screenHeight - 100,
+        this.screenHeight - 120,
         this.screenWidth,
         this.screenHeight
       );
@@ -577,6 +583,17 @@ export class GameScene extends Scene {
     }
     
     console.log('Game restarted');
+  }
+  
+  /**
+   * Ensure player is in the scene (call after respawn)
+   * This method can be called during update to ensure the player ship is properly in the scene
+   */
+  private ensurePlayerInScene(): void {
+    if (this.player && this.player.isActive() && !this.player.getContainer().parent) {
+      console.log('Re-adding player container to scene after respawn');
+      this.container.addChild(this.player.getContainer());
+    }
   }
   
   /**

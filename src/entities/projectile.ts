@@ -3,6 +3,7 @@ import { Entity } from './entity';
 import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
 import { AssetLoader } from '../library/asset-loader';
+import { ExplosionManager, ExplosionType } from '../library/explosion-manager';
 
 /**
  * Projectile types
@@ -61,8 +62,19 @@ class ProjectileExplodingState implements State {
     const projectile = owner.getOwner() as Projectile;
     this.explosionTimer = 0;
     
-    // Later: Play explosion animation
-    console.log('Projectile exploding!');
+    // Play explosion animation
+    ExplosionManager.getInstance().createExplosion(
+      ExplosionType.PIXEL,
+      projectile.getX(),
+      projectile.getY(),
+      projectile.getContainer().parent || projectile.getContainer(),
+      0.75 // Scale down the explosion a bit
+    );
+    
+    // Hide the projectile sprite while explosion plays
+    projectile.setActive(false);
+    
+    console.log('Projectile exploding with pixel explosion animation!');
   }
   
   public update(owner: StateMachine, deltaTime: number): void {

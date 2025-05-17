@@ -17,6 +17,7 @@ The game will be structured with the following key components:
 7. **Asset Manager**: Loads and manages game assets (sprites, sounds)
    - Includes spritesheet parsing and texture frame extraction
    - Maintains a texture cache for reuse across the application
+   - Uses proper Pixi.js v8.9 texture creation approach (new Texture constructor)
 
 ## Design Patterns
 
@@ -39,8 +40,9 @@ The game will be structured with the following key components:
 
 ### Texture Management
 - XML-based spritesheet parsing to extract individual frame textures
-- Texture caching to optimize memory usage and rendering performance
+- Texture creation using Pixi.js v8.9's Texture constructor with source and frame specification
 - Frame-specific texture lookup by name for easy entity sprite assignment
+- Entity scale adjustment for better visual proportions
 
 ## Component Relationships
 
@@ -67,10 +69,13 @@ Game Manager
 1. **Core Game Loop**: Initialize Pixi.js application and set up the main game loop
 2. **Asset Loading**: Load all game assets before starting gameplay
    - Properly parse spritesheets and extract texture frames
-   - Create individual textures for each frame with correct rectangle bounds
+   - Create individual textures using new Texture constructor with source and frame
    - Store textures with appropriate naming for entity access
 3. **Player Controls**: Implement responsive ship movement and shooting
 4. **Enemy Spawning**: Create enemy spawning system with increasing difficulty
+   - Enforce maximum 10 enemies on screen
+   - Control shooting frequency (minimum 0.5s between shots)
+   - Limit active shots per enemy (maximum 3)
 5. **Collision Detection**: Implement accurate collision detection between entities
 6. **State Machine**: Create reusable state machine for entity behaviors
 7. **UI System**: Display score, lives, and game messages
@@ -81,5 +86,7 @@ Game Manager
 2. **Object Pooling**: Reuse objects to minimize garbage collection
 3. **Collision Optimization**: Use spatial partitioning for efficient collision detection
 4. **Asset Management**: Proper use of spritesheets to reduce texture switches
-5. **Texture Optimization**: Extract and cache individual textures from spritesheets to avoid redundant processing
-6. **Positioning Optimization**: Properly anchor sprites to ensure consistent positioning and collision detection 
+5. **Texture Optimization**: Create textures properly using Pixi.js v8.9's approach
+6. **Positioning Optimization**: Properly anchor sprites to ensure consistent positioning and collision detection
+7. **Entity Scaling**: Adjust sprite scales to maintain appropriate visual proportions
+8. **Enemy Limitation**: Restrict active enemies to improve performance and gameplay balance 

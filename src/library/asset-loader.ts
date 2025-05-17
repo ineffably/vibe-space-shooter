@@ -14,7 +14,11 @@ export enum AssetType {
  */
 const ASSET_MANIFESTS = {
   spritesheets: [
-    { name: 'space-shooter', imageUrl: 'assets/spritesheet/sheet.png', xmlUrl: 'assets/spritesheet/sheet.xml' }
+    { name: 'space-shooter', imageUrl: 'assets/spritesheet/sheet.png', xmlUrl: 'assets/spritesheet/sheet.xml' },
+    { name: 'pixel-explosion', imageUrl: 'assets/spritesheet/spritesheet_pixelExplosion.png', 
+      xmlUrl: 'assets/spritesheet/spritesheet_pixelExplosion.xml' },
+    { name: 'sonic-explosion', imageUrl: 'assets/spritesheet/spritesheet_sonicExplosion.png', 
+      xmlUrl: 'assets/spritesheet/spritesheet_sonicExplosion.xml' }
   ],
   textures: [
     { name: 'black', url: 'assets/backgrounds/black.png' }
@@ -107,14 +111,21 @@ export class AssetLoader {
               const height = parseInt(subtexture.getAttribute('height') || '0', 10);
               
               // Create a texture with the frame information - Pixi.js v8.9 method
-              // Clone the base texture first
-              const texture = baseTextureAsset.clone();
-              
-              // Set the frame property to define the visible portion
-              texture.frame = new Rectangle(x, y, width, height);
+              // Create a new texture from the base texture and frame
+              const texture = new Texture({
+                source: baseTextureAsset.source,
+                frame: new Rectangle(x, y, width, height)
+              });
               
               // Store the texture with its frame name
               this.textures.set(name, texture);
+              
+              // Add prefixed name for explosion frames to follow convention in explosion manager
+              if (sheet.name === 'sonic-explosion') {
+                this.textures.set(`spritesheet_sonicExplosion_${name.replace('sonicExplosion', '')}`, texture);
+              } else if (sheet.name === 'pixel-explosion') {
+                this.textures.set(`spritesheet_pixelExplosion_${name.replace('pixelExplosion', '')}`, texture);
+              }
               
               if (this.loadingDebug && i < 5) {
                 console.log(`Created texture for frame: ${name}`, 

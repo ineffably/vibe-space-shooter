@@ -38,6 +38,10 @@ pixi-space-shooter/
 │   ├── spritesheets/      # Sprite sheets for animations
 │   │   ├── sheet.png      # Combined image of all sprites
 │   │   └── sheet.xml      # XML definition of frame coordinates
+│   │   ├── spritesheet_pixelExplosion.png  # Pixel explosion animation
+│   │   ├── spritesheet_pixelExplosion.xml  # Pixel explosion frame data
+│   │   ├── spritesheet_sonicExplosion.png  # Sonic explosion animation
+│   │   └── spritesheet_sonicExplosion.xml  # Sonic explosion frame data
 │   └── audio/             # Sound effects and music
 ├── src/                   # Source code
 │   ├── core/              # Core game engine components
@@ -91,10 +95,17 @@ pixi-space-shooter/
 
 ### Texture Handling in Pixi.js v8.9
 - Rectangle for texture frame: `new Rectangle(x, y, width, height)`
-- Creating textured sprites from spritesheet frames
-- Texture cache management for efficient reuse
-- Proper debugging of texture loading and application
-- Handling position and origin with sprite anchors
+- Creating textured sprites from spritesheet frames:
+  - Do NOT use: `new Texture(baseTexture, frameRect)` - Not supported in v8.9
+  - Instead: Clone the base texture and set its frame property:
+    ```typescript
+    const texture = baseTextureAsset.clone();
+    texture.frame = new Rectangle(x, y, width, height);
+    ```
+- Store each extracted texture by name in a cache (Map) for reuse
+- Access textures by name rather than reconstructing them each time
+- Be aware of sprite anchor points when positioning sprites on screen
+- For animated explosions, use the dedicated explosion spritesheets
 
 ### TypeScript Usage
 - Define interfaces for all major components

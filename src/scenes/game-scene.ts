@@ -390,6 +390,13 @@ export class GameScene extends Scene {
    * Spawn a new enemy
    */
   private spawnEnemy(): void {
+    // Check if we already have 10 active enemies (per spec requirement)
+    const activeEnemies = this.enemies.filter(enemy => enemy.isActive()).length;
+    if (activeEnemies >= 10) {
+      console.log(`Maximum enemies (10) already on screen. Skipping spawn.`);
+      return;
+    }
+    
     // Random x position
     const x = Math.random() * (this.screenWidth - 100) + 50;
     
@@ -417,7 +424,7 @@ export class GameScene extends Scene {
     // Add to scene
     this.container.addChild(enemy.getContainer());
     
-    console.log(`Enemy added to scene. Total enemies: ${this.enemies.length}`);
+    console.log(`Enemy added to scene. Total active enemies: ${activeEnemies + 1}`);
   }
   
   /**

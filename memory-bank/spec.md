@@ -24,7 +24,7 @@ Building and Hosting
 - This will be hosted on github pages, so an index.html at the root would help with that
 
 Developing
-- Use the Vite TS cli to initialize the repo
+- Use the Vite for the development environemtn with the appropriate typescript template
 
 Language
 - Use Typescript as the programming language
@@ -49,9 +49,17 @@ Frameworks
 
 ## Assets
 
+Assets folder:
+/assets/spritesheet/sheet.xml
+/assets/spritesheet/sheet.png
+/assets/spritesheet/spritesheet_pixelExplosion.xml
+/assets/spritesheet/spritesheet_pixelExplosion.png
+/assets/spritesheet/spritesheet_sonicExplosion.xml
+/assets/spritesheet/spritesheet_sonicExplosion.png
+
 the assets exist in the assets folder and should be loaded using the PIXI asset loader.
 The spritesheet has the following textures that should be used as the visible game assets on screen. 
-The spritesheet assets are assigned as follows...
+The textures from the sheet.xml assets are assigned as follows:
 
 | Purpose  | Texture |
 | ---- |:----:|
@@ -64,12 +72,17 @@ The spritesheet assets are assigned as follows...
 | Laser explosion | spritesheet_pixelExplosion |
 | Ship explosion | spritesheet_sonicExplosion |
 
-Background Image: /assets/backgrounds/black.png
+
+| Purpose  | Texture |
+| ---- |:----:|
+| Background Image |  /assets/backgrounds/black.png |
 
 ## Player
 
+entity of type Sprite
+sprite with texture playerShip1_blue in sheet.xml
 The player is the ship they control 
-The player ship movment uses the arrow keys for left/right and up/down
+The player ship movement uses the arrow keys for slide left/right and up/down
 The player score is persistently shown in the top left along with the number of lives left
 the player score starts at zero and increases with each enemy destroyed
 When the player is destroyed the Ship explosion should be shown and animated
@@ -78,8 +91,13 @@ the base-line player damage per laser hit is 50
 
 ## Enemy 
 
+entity of type Sprite
+sprite with texture enemyRed1, enemyRed2, or enemyRed3 at random in sheet.xml
 the enemies come into the screen from the top
-they are randomized between the ones I listed for the assets as enemy 1, 2, and 3
+at most there are 10 enemies on the screen at once
+the enemy ships shoot at variables no less than 0.5 seconds apart and can only have 3 active shots at once
+the enemy entity texture can be randomized between enemyRed1, enemyRed2, or enemyRed3
 they have 100 hitpoints
 they take damage applied from the projectile damage property
-they shoot down at regular intervals and randomly move right or left 
+they shoot their lasers down at regular intervals and randomly move right or left
+the show an animated sprite using the explosion spritesheet called spritesheet_sonicExplosion 

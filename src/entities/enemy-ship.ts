@@ -4,6 +4,7 @@ import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
 import { AssetLoader } from '../library/asset-loader';
 import { Projectile, ProjectileType } from './projectile';
+import { ExplosionManager, ExplosionType } from '../library/explosion-manager';
 
 /**
  * Enum for enemy types
@@ -140,12 +141,22 @@ class EnemyDestroyedState implements State {
   public enter(owner: StateMachine): void {
     this.destroyedTimer = 0;
     
-    // Play explosion animation
-    console.log('Enemy destroyed!');
-    
-    // Hide the sprite
+    // Get the enemy
     const enemy = owner.getOwner() as EnemyShip;
+    
+    // Play explosion animation
+    ExplosionManager.getInstance().createExplosion(
+      ExplosionType.SONIC,
+      enemy.getX(),
+      enemy.getY(),
+      enemy.getContainer().parent || enemy.getContainer()
+    );
+    
+    // Hide the enemy sprite
     enemy.setActive(false);
+    
+    // Log for debugging
+    console.log(`Enemy ${enemy.getType()} destroyed with explosion animation!`);
   }
   
   public update(owner: StateMachine, deltaTime: number): void {
@@ -227,6 +238,10 @@ export class EnemyShip extends Entity {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
     
+    // Set minimum shoot cooldown to 0.5 seconds (500ms) as per the spec
+    // Add some randomness so enemies don't all shoot at the same time
+    this.shootCooldown = 500 + Math.random() * 1500; // Between 0.5 and 2 seconds
+    
     // Create the sprite
     const texture = AssetLoader.getInstance().getTexture(this.type);
     
@@ -235,6 +250,9 @@ export class EnemyShip extends Entity {
       
       if (this.sprite) {
         this.sprite.anchor.set(0.5);
+        
+        // Scale down the sprite to a more appropriate size
+        this.sprite.scale.set(0.6);
         
         // Debug console log to see if enemy is created
         console.log(`Enemy ship created: ${this.type} at (${x}, ${y}) with texture dimensions: ${this.sprite.width}x${this.sprite.height}`);
@@ -336,6 +354,12 @@ export class EnemyShip extends Entity {
     // Skip shooting if not active
     if (!this.active || !this.sprite) return;
 
+    // Check if we already have the maximum number of active shots (3 per spec)
+    if (this.activeProjectiles.length >= 3) {
+      console.log(`Enemy ${this.type} already has maximum (3) active shots. Skipping.`);
+      return;
+    }
+
     // Calculate projectile spawn position (bottom-center of the ship)
     const projectileX = this.x;
     const projectileY = this.y + (this.sprite.height / 2);
@@ -365,7 +389,7 @@ export class EnemyShip extends Entity {
     }
     
     // Debug log
-    console.log(`Enemy ${this.type} firing projectile at (${projectileX}, ${projectileY})`);
+    console.log(`Enemy ${this.type} firing projectile at (${projectileX}, ${projectileY}). Active shots: ${this.activeProjectiles.length}`);
     
     // Switch to shooting state
     this.stateMachine.setState(EnemyState.SHOOTING);

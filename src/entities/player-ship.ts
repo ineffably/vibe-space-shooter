@@ -4,6 +4,8 @@ import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
 import { InputManager } from '../core/input-manager';
 import { Projectile, ProjectilePool, ProjectileType } from './projectile';
+import { AssetLoader } from '../library/asset-loader';
+import { ExplosionManager, ExplosionType } from '../library/explosion-manager';
 
 /**
  * Player states
@@ -207,9 +209,21 @@ class PlayerDestroyedState implements State {
 
   public enter(owner: StateMachine): void {
     const player = owner.getOwner() as PlayerShip;
-    // Hide the player
+    
+    // Play explosion animation
+    ExplosionManager.getInstance().createExplosion(
+      ExplosionType.SONIC,
+      player.getX(),
+      player.getY(),
+      player.getContainer().parent || player.getContainer(),
+      1.5 // Scale up the explosion a bit
+    );
+    
+    // Hide the player sprite
     player.setActive(false);
     this.destroyTimer = 0;
+    
+    console.log('Player ship destroyed with sonic explosion animation!');
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
@@ -296,12 +310,24 @@ export class PlayerShip extends Entity {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
 
-    // Set the sprite
-    this.setSprite(Texture.WHITE); // Placeholder
+    // Set the sprite using the correct texture from the spritesheet
+    const texture = AssetLoader.getInstance().getTexture('playerShip1_blue');
+    console.log('Attempting to get playerShip1_blue texture:', texture);
+    console.log('Available textures:', AssetLoader.getInstance().listTextures());
+    this.setSprite(texture);
+    
     if (this.sprite) {
-      this.sprite.width = 40;
-      this.sprite.height = 60;
-      this.sprite.tint = 0x0000FF; // Blue
+      // Set anchor to center for proper positioning and rotation
+      this.sprite.anchor.set(0.5);
+      
+      // Scale down the sprite to a more appropriate size
+      this.sprite.scale.set(0.7);
+      
+      // Log for debugging
+      console.log(`Player ship created with texture: playerShip1_blue, dimensions: ${this.sprite.width}x${this.sprite.height}`);
+    } else {
+      console.error('Failed to create player ship sprite with texture: playerShip1_blue');
+      console.log('Available textures:', AssetLoader.getInstance().listTextures());
     }
     
     // Create projectile pool

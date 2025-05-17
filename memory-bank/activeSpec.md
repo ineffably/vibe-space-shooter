@@ -127,6 +127,10 @@ The following textures are used as visible game assets:
 | Enemy Lasers | laserRed05 | Implemented |
 | Laser explosion | spritesheet_pixelExplosion | Implemented |
 | Ship explosion | spritesheet_sonicExplosion | Implemented |
+| Shield power-up | powerupBlue_shield | Implemented |
+| Ship full shields | shield1 | Implemented |
+| Ship 2/3 shields | shield2 | Implemented |
+| Ship 1/3 shields | shield3 | Implemented |
 | Background Image | /assets/backgrounds/black.png | Implemented (base layer) |
 | Stars | Dynamically generated | Implemented |
 
@@ -220,6 +224,8 @@ The following sound effects are implemented:
 | Moving Star Background | ✓ | ✓ | Implemented with parallax effect and varying star properties |
 | Sound Effects | ✓ | ✓ | All key sound effects implemented with volume control | 
 | Player Respawn | ✓ | ✓ | Enhanced with random delay and temporary invulnerability |
+| Enemy Drops | ✓ | ✓ | Shield power-up drop system implemented |
+| Player Shields | ✓ | ✓ | Shield system with visual indicators implemented |
 | SideQuest Framework | ✗ | ✓ | Added reusable game framework (beyond original spec) |
 
 ## Additions Beyond Original Spec

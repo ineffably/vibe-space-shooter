@@ -71,6 +71,10 @@ The textures from the sheet.xml assets are assigned as follows:
 | Enemy Lasers | laserRed05 |
 | Laser explosion | spritesheet_pixelExplosion |
 | Ship explosion | spritesheet_sonicExplosion |
+| shield power-up | powerupBlue_shield |
+| ship full shields | shield1 |
+| ship 2/3 shields | shield2 |
+| ship 1/3 shields | shield3 |
 
 
 | Purpose  | Texture |
@@ -100,4 +104,28 @@ the enemy entity texture can be randomized between enemyRed1, enemyRed2, or enem
 they have 100 hitpoints
 they take damage applied from the projectile damage property
 they shoot their lasers down at regular intervals and randomly move right or left
-the show an animated sprite using the explosion spritesheet called spritesheet_sonicExplosion 
+the show an animated sprite using the explosion spritesheet called spritesheet_sonicExplosion
+
+## Enemy Drops
+
+Enemy drops will be a feature of this game, we will start with them dropping a shield power-up
+this will be the first of a few different drops that will enhance the gameplay
+so create a robust enemy drop system so that one or more items can spawn when enemies die. 
+When the player collides with a power-up an event occurs based on the type of power-up
+if the power-up is a sheild for instance, the ship gains shields
+
+shield powerup : powerupBlue_shield.png
+when an enemy ship explodes there is a 20% chance it will drop a shield token
+an enemy drop will slowly fall about 1/2 the speed of the enemy ship
+the shield power-up is identified by this graphic "powerupBlue_shield.png" in the sheet.xml. 
+
+## Player Shields
+
+The player does not start off with shields, a player gains shields by capturing an enemy ship drop that is a shield type drop.
+The player shield starts at 100 health each hit takes the shield down by 1/3
+once a shield is gone the player's health will be declining instead of the shield once again 
+when a player has shields, a shield entity should be attached to the ship 
+a graphic that represents the shield strength should be shown these shield strengths corellate with the following graphics;
+full strength: shield3.png
+2/3 strength shield2.png
+1/3 strength: shield1.png 

@@ -6,6 +6,7 @@ import { Projectile, ProjectilePool, ProjectileType } from './projectile';
 import { AssetLoader } from '../library/asset-loader';
 import { ExplosionManager, ExplosionType } from '../library/explosion-manager';
 import { SoundManager, SoundType } from '../library/sound-manager';
+import { Container, Sprite, Texture } from 'pixi.js';
 
 /**
  * Player states
@@ -341,84 +342,103 @@ class PlayerInvulnerableState implements State {
 }
 
 /**
+ * Shield strength levels
+ */
+enum ShieldStrength {
+  FULL = 'shield3', // 100%
+  MEDIUM = 'shield2', // 66%
+  LOW = 'shield1', // 33%
+  NONE = 'none', // 0%
+}
+
+/**
  * Player ship entity
  */
 export class PlayerShip extends Entity {
   /**
-   * Player health points
+   * Health points
    */
   public health: number = 100;
-
+  
   /**
-   * Maximum health
+   * Maximum health points
    */
   public readonly maxHealth: number = 100;
-
+  
   /**
-   * Player speed
+   * Movement speed
    */
   public readonly speed: number = 3.0;
-
+  
   /**
-   * Shoot cooldown in frames
+   * Shooting cooldown in frames (amount of time that must pass before player can shoot again)
    */
   public readonly shootCooldown: number = 10;
-
+  
   /**
-   * Damage inflicted by projectiles
+   * Damage dealt by this ship's projectiles
    */
   public readonly damage: number = 50;
-
+  
   /**
-   * Lives remaining
+   * Number of lives
    */
   private lives: number = 3;
-
+  
   /**
    * Score
    */
   private score: number = 0;
   
   /**
-   * Projectile pool
+   * Projectile pool for recycling projectiles
    */
   private projectilePool: ProjectilePool;
-
+  
   /**
    * Screen dimensions
    */
   private screenWidth: number;
   private screenHeight: number;
-
+  
   /**
-   * Game over callback
+   * Callback when game is over
    */
   private gameOverCallback: (() => void) | null = null;
 
   /**
+   * Shield health (0-100)
+   */
+  private shieldHealth: number = 0;
+
+  /**
+   * Maximum shield health
+   */
+  private readonly maxShieldHealth: number = 100;
+
+  /**
+   * Shield sprite
+   */
+  private shieldSprite: Sprite | null = null;
+
+  /**
+   * Shield container for positioning
+   */
+  private shieldContainer: Container;
+  
+  /**
    * Constructor
    * @param x Initial x position
    * @param y Initial y position
-   * @param screenWidth Screen width
-   * @param screenHeight Screen height
+   * @param screenWidth Screen width for boundary checks
+   * @param screenHeight Screen height for boundary checks
    */
   constructor(x: number, y: number, screenWidth: number = 800, screenHeight: number = 600) {
     super(x, y);
     
+    // Store screen dimensions
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
-
-    // Set the sprite using the correct texture from the spritesheet
-    const texture = AssetLoader.getInstance().getTexture('playerShip1_blue');
-    this.setSprite(texture);
-    
-    if (this.sprite) {
-      // Set anchor to center for proper positioning and rotation
-      this.sprite.anchor.set(0.5);
-      
-      // Scale down the sprite to a more appropriate size
-      this.sprite.scale.set(0.7);
-    }
     
     // Create projectile pool
     this.projectilePool = new ProjectilePool(
@@ -429,6 +449,21 @@ export class PlayerShip extends Entity {
       screenWidth,
       screenHeight
     );
+    
+    // Set the sprite
+    this.setSprite(AssetLoader.getInstance().getTexture('playerShip1_blue'));
+    
+    // Scale the player ship down a bit
+    if (this.sprite) {
+      this.sprite.scale.set(0.7);
+    }
+
+    // Create shield container
+    this.shieldContainer = new Container();
+    this.container.addChild(this.shieldContainer);
+    
+    // Set initial state
+    this.stateMachine.setState(PlayerState.IDLE);
   }
 
   /**
@@ -555,22 +590,47 @@ export class PlayerShip extends Entity {
 
   /**
    * Take damage
-   * @param amount Damage amount
+   * @param amount Amount of damage to take
    */
   public takeDamage(amount: number): void {
-    // Skip damage if player is already destroyed or invulnerable
-    if (this.health <= 0 || this.isInvulnerable()) return;
+    // Skip damage if already destroyed or in invulnerable state
+    if (this.stateMachine.getCurrentState()?.name === PlayerState.DESTROYED ||
+        this.stateMachine.getCurrentState()?.name === PlayerState.INVULNERABLE) {
+      return;
+    }
 
-    this.health -= amount;
-    
     // Play damage sound
     SoundManager.getInstance().play(SoundType.PLAYER_DAMAGE);
 
-    // If health reaches zero, destroy the player
+    // If we have shields, damage them first
+    if (this.shieldHealth > 0) {
+      this.shieldHealth -= amount;
+      
+      // Update shield visual
+      this.updateShieldVisual();
+      
+      console.log(`Player shield took damage! Shield health: ${this.shieldHealth}`);
+      
+      // If shield depleted, play special effect
+      if (this.shieldHealth <= 0) {
+        this.shieldHealth = 0;
+        this.hideShield();
+        // Could add a shield break effect/sound here
+      }
+      
+      // No damage to player if shield absorbed it
+      return;
+    }
+    
+    // Reduce health
+    this.health -= amount;
+    console.log(`Player took damage! Health: ${this.health}`);
+    
+    // Check if destroyed
     if (this.health <= 0) {
-      this.destroy();
+      this.health = 0;
+      this.stateMachine.setState(PlayerState.DESTROYED);
     } else {
-      // Otherwise, transition to damaged state
       this.stateMachine.setState(PlayerState.DAMAGED);
     }
   }
@@ -686,5 +746,89 @@ export class PlayerShip extends Entity {
    */
   public clearProjectiles(): void {
     this.projectilePool.deactivateAll();
+  }
+
+  /**
+   * Add shield to the player
+   */
+  public addShield(): void {
+    // Reset shield health to full
+    this.shieldHealth = this.maxShieldHealth;
+    
+    // Update shield visual
+    this.updateShieldVisual();
+    
+    console.log(`Player gained a shield! Shield health: ${this.shieldHealth}`);
+    
+    // Play shield activation sound
+    SoundManager.getInstance().play(SoundType.SHIELD_ACTIVATE);
+  }
+
+  /**
+   * Check if player has an active shield
+   */
+  public hasShield(): boolean {
+    return this.shieldHealth > 0;
+  }
+
+  /**
+   * Get shield health percentage (0-100)
+   */
+  public getShieldHealthPercentage(): number {
+    return (this.shieldHealth / this.maxShieldHealth) * 100;
+  }
+
+  /**
+   * Update shield visual based on current shield health
+   */
+  private updateShieldVisual(): void {
+    // Remove old shield sprite if it exists
+    if (this.shieldSprite && this.shieldSprite.parent) {
+      this.shieldSprite.parent.removeChild(this.shieldSprite);
+      this.shieldSprite = null;
+    }
+    
+    // If shield is depleted, don't show anything
+    if (this.shieldHealth <= 0) {
+      this.hideShield();
+      return;
+    }
+    
+    // Determine shield strength level based on percentage
+    let strengthLevel: ShieldStrength;
+    const percentage = this.getShieldHealthPercentage();
+    
+    if (percentage >= 66) {
+      strengthLevel = ShieldStrength.FULL; // > 66%
+    } else if (percentage >= 33) {
+      strengthLevel = ShieldStrength.MEDIUM; // 33-66%
+    } else {
+      strengthLevel = ShieldStrength.LOW; // < 33%
+    }
+    
+    // Create shield sprite with appropriate texture
+    const texture = AssetLoader.getInstance().getTexture(strengthLevel);
+    this.shieldSprite = new Sprite(texture);
+    
+    // Center the shield on the player
+    this.shieldSprite.anchor.set(0.5);
+    
+    // Scale the shield appropriately
+    this.shieldSprite.scale.set(0.7);
+    
+    // Add to shield container
+    this.shieldContainer.addChild(this.shieldSprite);
+    
+    console.log(`Updated shield visual to ${strengthLevel} (${percentage.toFixed(1)}%)`);
+  }
+
+  /**
+   * Hide the shield visual
+   */
+  private hideShield(): void {
+    if (this.shieldSprite && this.shieldSprite.parent) {
+      this.shieldSprite.parent.removeChild(this.shieldSprite);
+      this.shieldSprite = null;
+    }
   }
 } 

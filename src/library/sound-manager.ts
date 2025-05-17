@@ -10,7 +10,8 @@ export enum SoundType {
   EXPLOSION_LARGE = 'explosionLarge',
   PLAYER_DAMAGE = 'playerDamage',
   GAME_OVER = 'gameOver',
-  UI_SELECT = 'uiSelect'
+  UI_SELECT = 'uiSelect',
+  SHIELD_ACTIVATE = 'shieldActivate'
 }
 
 /**
@@ -180,7 +181,10 @@ export class SoundManager {
       { key: SoundType.GAME_OVER, path: 'assets/audio/lowFrequency_explosion_000.ogg', volume: 0.8, loop: false },
       
       // UI select sound - using computerNoise
-      { key: SoundType.UI_SELECT, path: 'assets/audio/computerNoise_002.ogg', volume: 0.5, loop: false }
+      { key: SoundType.UI_SELECT, path: 'assets/audio/computerNoise_002.ogg', volume: 0.5, loop: false },
+      
+      // Shield activation sound - using powerUp
+      { key: SoundType.SHIELD_ACTIVATE, path: 'assets/audio/powerUp_001.ogg', volume: 0.6, loop: false }
     ];
 
     try {

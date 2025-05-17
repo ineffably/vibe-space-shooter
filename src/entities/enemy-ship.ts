@@ -5,6 +5,7 @@ import { AssetLoader } from '../library/asset-loader';
 import { Projectile, ProjectileType } from './projectile';
 import { ExplosionManager, ExplosionType } from '../library/explosion-manager';
 import { SoundManager, SoundType } from '../library/sound-manager';
+import { PowerUp, PowerUpType } from './power-up';
 
 /**
  * Enum for enemy types
@@ -152,6 +153,12 @@ class EnemyDestroyedState implements State {
       enemy.getContainer().parent || enemy.getContainer()
     );
     
+    // Play explosion sound
+    SoundManager.getInstance().play(SoundType.EXPLOSION_LARGE);
+    
+    // Chance to drop a power-up (20% chance for shield)
+    enemy.tryDropPowerUp();
+    
     // Hide the enemy sprite
     enemy.setActive(false);
     
@@ -242,6 +249,11 @@ export class EnemyShip extends Entity {
    * Initial spawn X position for centered movement
    */
   private spawnX: number = 0;
+  
+  /**
+   * Callback for when a power-up is dropped
+   */
+  private onPowerUpDroppedCallback: ((powerUp: PowerUp) => void) | null = null;
   
   /**
    * Constructor
@@ -550,5 +562,40 @@ export class EnemyShip extends Entity {
     
     // Call parent destroy
     super.destroy();
+  }
+  
+  /**
+   * Try to drop a power-up
+   * Shield power-up has a 20% chance of dropping
+   */
+  public tryDropPowerUp(): void {
+    // 20% chance to drop a shield power-up
+    const dropChance = Math.random();
+    
+    if (dropChance <= 0.2) { // 20% chance
+      console.log('Enemy dropping shield power-up!');
+      
+      // Create a shield power-up at the enemy's position
+      const powerUp = new PowerUp(
+        this.x,
+        this.y,
+        PowerUpType.SHIELD,
+        this.verticalSpeed, // Match the enemy's vertical speed (was half speed)
+        this.screenHeight
+      );
+      
+      // Notify the game scene about the power-up
+      if (this.onPowerUpDroppedCallback) {
+        this.onPowerUpDroppedCallback(powerUp);
+      }
+    }
+  }
+  
+  /**
+   * Set the callback for when a power-up is dropped
+   * @param callback Callback function
+   */
+  public setOnPowerUpDroppedCallback(callback: (powerUp: PowerUp) => void): void {
+    this.onPowerUpDroppedCallback = callback;
   }
 } 

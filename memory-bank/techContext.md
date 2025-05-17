@@ -6,9 +6,10 @@
 - **TypeScript**: Type-safe programming language that compiles to JavaScript
 - **Pixi.js v8.9**: 2D rendering engine for creating interactive graphics
 - **Vite**: Fast, modern build tool and development server
+- **ESLint**: Static code analysis tool for identifying problematic patterns
+- **Howler.js**: Audio library that provides cross-browser audio support
 
 ### Development Tools
-- **ESLint**: Static code analysis tool for identifying problematic patterns
 - **Git**: Version control system for tracking changes
 - **GitHub Pages**: Hosting platform for the deployed game
 
@@ -25,6 +26,7 @@ npm install
 ```bash
 # Core dependencies
 npm install pixi.js@8.9
+npm install howler@2.2.3
 
 # Development dependencies
 npm install --save-dev eslint typescript
@@ -131,3 +133,134 @@ pixi-space-shooter/
 - Follow standard ESLint rules
 - Use autofix for quick corrections
 - Maintain consistent code style 
+
+## Key Technical Components
+
+### Entity System
+
+The entity system is built around a base `Entity` class that provides common functionality:
+
+- Position tracking (x, y)
+- Container management (PIXI.Container)
+- Sprite management
+- Active state management
+- Update method for game loop integration
+- State machine integration
+
+Specialized entities (PlayerShip, EnemyShip, Projectile, PowerUp) extend this base class and implement their own behaviors.
+
+### State Machine
+
+The state machine pattern is used throughout the game to manage entity behaviors:
+
+- Each entity has a state machine
+- States encapsulate specific behaviors (idle, moving, shooting, damaged, destroyed, etc.)
+- State transitions trigger appropriate actions
+- Update method called each frame
+
+This makes complex entity behaviors easier to understand and modify.
+
+### Asset Management
+
+Assets are loaded using the AssetLoader:
+
+- Singleton pattern for global access
+- Preloads all assets before game starts
+- Handles spritesheets and extracts individual textures
+- Proper XML parsing for spritesheet data
+- Fixed texture handling for Pixi.js v8.9
+
+### Sound System
+
+Sound effects are managed through the SoundManager:
+
+- Singleton pattern for centralized sound control
+- Preloads all sound effects
+- Manages playback with volume control
+- Handles multiple concurrent sounds
+
+### Projectile System
+
+Projectiles use an object pooling system for performance:
+
+- Pre-created pool of projectile objects
+- Reuse inactive projectiles instead of creating new ones
+- Reduces garbage collection overhead
+- Each projectile has active, exploding, and inactive states
+
+### Explosion System
+
+The ExplosionManager handles creating and playing explosion animations:
+
+- Creates animated sprites from explosion spritesheets
+- Handles different explosion types (pixel, sonic)
+- Properly positions explosions at entity locations
+- Automatically removes explosions after animation completes
+
+### Power-Up System
+
+The power-up system handles dropping and collecting power-ups:
+
+- EnemyShip has 20% chance to drop a shield power-up when destroyed
+- PowerUp entity with active, collected, and inactive states
+- Falls at the same speed as enemy ships
+- Collision detection with player
+- Shield system activated when collected
+
+### Shield System
+
+The shield system protects the player from damage:
+
+- PlayerShip has shield health (100 when full)
+- Visual representation using shield1, shield2, shield3 textures
+- Shield absorbs damage before player health
+- Shield health depletes by 1/3 with each hit
+- Visual changes to reflect current shield strength
+
+### Background System
+
+The StarBackground creates a scrolling space effect:
+
+- Generates stars with varying properties
+- Multiple layers for parallax effect
+- Continuous scrolling from top to bottom
+- Dynamically creates and positions stars
+
+### Input System
+
+Input is handled by the InputManager:
+
+- Keyboard event handling
+- Key state tracking (pressed, released)
+- Direction vector calculation
+- Singleton pattern for global access
+
+### Scene System
+
+The game is organized into scenes:
+
+- GameScene for main gameplay
+- GameOverScene for game over state
+- Each scene manages its own entities and updates
+
+## Development Setup
+
+- Node.js environment
+- npm install to install dependencies
+- npm run dev to start development server
+- npm run build to create production build
+- npm run lint to run ESLint
+- npm run preview to preview production build
+
+## Dependencies
+
+- pixi.js: 8.9.2 - 2D rendering engine
+- howler: 2.2.3 - Audio library
+
+## Development Dependencies
+
+- typescript: 5.4.3 - TypeScript compiler
+- vite: 5.2.8 - Build tool
+- eslint: 9.0.1 - Linting tool
+- @typescript-eslint/eslint-plugin: 7.2.0 - TypeScript ESLint plugin
+- @typescript-eslint/parser: 7.2.0 - TypeScript ESLint parser 

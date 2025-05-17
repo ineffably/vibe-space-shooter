@@ -6,6 +6,7 @@ import { EnemyShip, EnemyType } from '../entities/enemy-ship';
 import { AssetLoader } from '../library/asset-loader';
 import { StarBackground } from '../library/star-background';
 import { SoundManager, SoundType } from '../library/sound-manager';
+import { PowerUp, PowerUpType } from '../entities/power-up';
 
 /**
  * Main gameplay scene
@@ -116,6 +117,11 @@ export class GameScene extends Scene {
    * Update listeners for animations
    */
   private updateListeners: ((deltaTime: number) => void)[] = [];
+  
+  /**
+   * Power-ups in the scene
+   */
+  private powerUps: PowerUp[] = [];
   
   /**
    * Constructor
@@ -302,13 +308,42 @@ export class GameScene extends Scene {
     // Update enemies
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const enemy = this.enemies[i];
+      
+      // Update enemy
       enemy.update(deltaTime);
       
-      // Remove inactive enemies
+      // If enemy is off-screen (went past bottom), remove it
+      if (enemy.getY() > this.screenHeight + 100) {
+        // Only remove if active (we might have inactive enemies waiting to be removed)
+        if (enemy.isActive()) {
+          enemy.setActive(false);
+        }
+      }
+      
+      // Clean up destroyed enemies
       if (!enemy.isActive()) {
         enemy.destroy();
         this.enemies.splice(i, 1);
       }
+    }
+    
+    // Update power-ups
+    for (let i = this.powerUps.length - 1; i >= 0; i--) {
+      const powerUp = this.powerUps[i];
+      
+      // Update power-up
+      powerUp.update(deltaTime);
+      
+      // Clean up inactive power-ups
+      if (!powerUp.isActive()) {
+        powerUp.destroy();
+        this.powerUps.splice(i, 1);
+      }
+    }
+    
+    // Update animations
+    for (const listener of this.updateListeners) {
+      listener(deltaTime);
     }
   }
   
@@ -398,6 +433,46 @@ export class GameScene extends Scene {
         }
       }
     }
+    
+    // Check power-ups against player
+    for (let i = 0; i < this.powerUps.length; i++) {
+      const powerUp = this.powerUps[i];
+      if (!powerUp.isActive()) continue;
+      
+      // Simple circle collision with player
+      const dx = powerUp.getX() - this.player.getX();
+      const dy = powerUp.getY() - this.player.getY();
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // If colliding
+      if (distance < 40) { // Larger collision radius for easier pickup
+        // Apply power-up effect
+        this.applyPowerUpEffect(powerUp);
+        
+        // Power-up is collected
+        powerUp.onCollected();
+      }
+    }
+  }
+  
+  /**
+   * Apply power-up effect to the player
+   * @param powerUp The power-up to apply
+   */
+  private applyPowerUpEffect(powerUp: PowerUp): void {
+    if (!this.player) return;
+    
+    switch (powerUp.getType()) {
+      case PowerUpType.SHIELD:
+        // Add shield to player
+        this.player.addShield();
+        console.log('Player collected shield power-up!');
+        break;
+      default:
+        // Unknown power-up type
+        console.warn(`Unknown power-up type: ${powerUp.getType()}`);
+        break;
+    }
   }
   
   /**
@@ -481,6 +556,11 @@ export class GameScene extends Scene {
       this.screenHeight
     );
     
+    // Set power-up drop callback
+    enemy.setOnPowerUpDroppedCallback((powerUp: PowerUp) => {
+      this.addPowerUp(powerUp);
+    });
+    
     // Vary the vertical speed dramatically
     const verticalSpeed = 0.3 + Math.random() * 1.7; // Between 0.3 and 2.0 speed
     enemy.setVerticalSpeed(verticalSpeed);
@@ -495,6 +575,20 @@ export class GameScene extends Scene {
     this.container.addChild(enemy.getContainer());
     
     console.log(`Enemy added to scene. Total active enemies: ${activeEnemies + 1}`);
+  }
+  
+  /**
+   * Add a power-up to the scene
+   * @param powerUp The power-up to add
+   */
+  private addPowerUp(powerUp: PowerUp): void {
+    // Add to power-ups array
+    this.powerUps.push(powerUp);
+    
+    // Add to scene
+    this.container.addChild(powerUp.getContainer());
+    
+    console.log(`Power-up added to scene. Type: ${powerUp.getType()}`);
   }
   
   /**
@@ -567,6 +661,12 @@ export class GameScene extends Scene {
       enemy.destroy();
     }
     this.enemies = [];
+    
+    // Clear power-ups
+    for (const powerUp of this.powerUps) {
+      powerUp.destroy();
+    }
+    this.powerUps = [];
     
     // Reset player
     if (this.player) {

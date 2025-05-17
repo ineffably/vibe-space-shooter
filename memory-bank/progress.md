@@ -6,6 +6,8 @@ We have implemented the core game architecture, the player ship with movement an
 
 We have also successfully fixed a critical issue with Pixi.js v8.9 texture creation by replacing the incorrect baseTextureAsset.clone() approach with the proper Texture constructor. This issue was causing textures not to appear despite being properly loaded. We've also adjusted entity scaling and implemented the enemy system limits required by the spec (max 10 enemies, min 0.5s shooting interval, max 3 active shots per enemy).
 
+Most recently, we've fixed a player ship movement issue, fine-tuning the movement speed to a balanced 3.0 value that provides responsive yet controlled movement. This involved adding debug logs to diagnose input handling and state machine transitions.
+
 ## What Works
 
 - Memory bank documentation is complete with:
@@ -27,7 +29,7 @@ We have also successfully fixed a critical issue with Pixi.js v8.9 texture creat
   - Base entity class
 - Player ship implementation:
   - Proper "playerShip1_blue" texture from the spritesheet
-  - Player movement with arrow keys
+  - Player movement with arrow keys at balanced speed (3.0)
   - State machine with idle, moving, shooting, damaged, and destroyed states
   - Health and lives system
   - Screen boundary constraints
@@ -104,6 +106,13 @@ We have also successfully fixed a critical issue with Pixi.js v8.9 texture creat
 
 ## Evolution of Project Decisions
 
+- Fixed player ship movement issues:
+  - Initially implemented with speed 5, which was too slow with deltaTime
+  - Increased to 300, which was far too fast for precision control
+  - Reduced to 0.3, which was too slow for responsive gameplay
+  - Finally settled on 3.0 for balanced, responsive movement
+  - Added debug logs to player state transitions to diagnose movement issues
+  - Added debug logs to input system to verify key event handling
 - Fixed critical texture loading issue with Pixi.js v8.9:
   - Discovered that baseTextureAsset.clone() is not a function in Pixi.js v8.9
   - Replaced with proper texture creation: new Texture({ source: baseTextureAsset.source, frame: rectangle })

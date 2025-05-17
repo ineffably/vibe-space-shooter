@@ -8,6 +8,8 @@ We have successfully implemented proper textures for game entities and added exp
 
 We have also adjusted entity scaling to make ships appear at a more appropriate size, and implemented the enemy limits from the spec (maximum 10 enemies on screen, 3 active shots per enemy, and minimum shooting interval of 0.5 seconds).
 
+We've also fixed a critical issue with player ship movement, adjusting the ship speed to 3.0 (down from the initial 300 which was too fast, and up from 0.3 which was too slow). This provides a balanced, responsive movement experience that feels right within the game environment.
+
 Our current focus is on implementing the scrolling star background and adding sound effects to further enhance the gaming experience according to the spec.
 
 ## Recent Changes
@@ -19,6 +21,10 @@ Our current focus is on implementing the scrolling star background and adding so
 - Adjusted entity scaling for better game feel:
   - Reduced player ship scale to 0.7
   - Reduced enemy ship scale to 0.6
+- Fixed player ship movement:
+  - Added debugging logs to input manager to verify key events
+  - Fixed player ship movement speed (set to 3.0) for proper control responsiveness
+  - Added debug logs to state machine transitions to diagnose movement issues
 - Implemented enemy system limits from the spec:
   - Limited to maximum 10 active enemies on screen at once
   - Enforced minimum shooting interval of 0.5 seconds between shots
@@ -84,6 +90,7 @@ Our current focus is on implementing the scrolling star background and adding so
 - Implementing enemy shooting frequency limits (min 0.5s between shots) per updated spec
 - Implementing enemy active shots limit (max 3 active) per updated spec
 - Adjusting entity scales for better visual balance
+- Setting player ship movement speed to 3.0 for balanced, responsive control
 
 ## Learnings and Insights
 
@@ -105,4 +112,8 @@ Our current focus is on implementing the scrolling star background and adding so
 - Proper debugging of texture loading is crucial for troubleshooting rendering issues
 - Positioning projectiles relative to their parent entity requires accounting for sprite anchor points
 - Enemy system needs careful management to adhere to the specified limits and behaviors
-- Visual scaling of entities has a big impact on gameplay feel and difficulty 
+- Visual scaling of entities has a big impact on gameplay feel and difficulty
+- Player ship movement speed is critical for game feel:
+  - Too fast (300) makes the game uncontrollable
+  - Too slow (0.3) makes it frustrating to play
+  - A balanced speed (3.0) provides responsive yet manageable control 

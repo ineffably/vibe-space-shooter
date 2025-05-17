@@ -44,6 +44,15 @@ The game will be structured with the following key components:
 - Frame-specific texture lookup by name for easy entity sprite assignment
 - Entity scale adjustment for better visual proportions
 
+### Movement and Delta Time
+- Entity movement tied to frame deltaTime for consistent speed across devices
+- Player ship speed calibrated to 3.0 for responsive yet controlled movement
+- Movement calculations applied in state machine update methods
+- Speed values carefully balanced:
+  - Too high (e.g., 300) makes control impossible
+  - Too low (e.g., 0.3) makes movement feel sluggish
+  - Balanced value (3.0) provides optimal responsiveness
+
 ## Component Relationships
 
 ```
@@ -72,6 +81,9 @@ Game Manager
    - Create individual textures using new Texture constructor with source and frame
    - Store textures with appropriate naming for entity access
 3. **Player Controls**: Implement responsive ship movement and shooting
+   - Calibrate movement speed for optimal game feel (3.0 multiplier)
+   - Ensure responsive state transitions between idle, moving, and shooting
+   - Implement movement constrained to screen boundaries
 4. **Enemy Spawning**: Create enemy spawning system with increasing difficulty
    - Enforce maximum 10 enemies on screen
    - Control shooting frequency (minimum 0.5s between shots)
@@ -89,4 +101,5 @@ Game Manager
 5. **Texture Optimization**: Create textures properly using Pixi.js v8.9's approach
 6. **Positioning Optimization**: Properly anchor sprites to ensure consistent positioning and collision detection
 7. **Entity Scaling**: Adjust sprite scales to maintain appropriate visual proportions
-8. **Enemy Limitation**: Restrict active enemies to improve performance and gameplay balance 
+8. **Enemy Limitation**: Restrict active enemies to improve performance and gameplay balance
+9. **Movement Optimization**: Carefully calibrated movement speeds to ensure game runs consistently across different devices and frame rates 

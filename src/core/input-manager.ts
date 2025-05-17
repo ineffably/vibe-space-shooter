@@ -33,15 +33,18 @@ export class InputManager {
     // Keydown event listener
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.keysPressed.add(event.key);
+      console.log(`Key pressed: ${event.key}, Keys now pressed:`, Array.from(this.keysPressed));
     });
 
     // Keyup event listener
     window.addEventListener('keyup', (event: KeyboardEvent) => {
       this.keysPressed.delete(event.key);
+      console.log(`Key released: ${event.key}, Keys now pressed:`, Array.from(this.keysPressed));
     });
 
     // Blur event listener to clear keys when window loses focus
     window.addEventListener('blur', () => {
+      console.log('Window lost focus, clearing all pressed keys');
       this.keysPressed.clear();
     });
   }

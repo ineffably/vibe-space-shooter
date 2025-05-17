@@ -93,6 +93,11 @@ export abstract class Entity {
   public update(deltaTime: number): void {
     if (!this.active) return;
     
+    // Log for debugging entity updates
+    if (this instanceof Object && (this.constructor as any).name === 'PlayerShip') {
+      console.log(`Updating player ship, deltaTime: ${deltaTime}`);
+    }
+    
     // Update the state machine
     this.stateMachine.update(deltaTime);
   }

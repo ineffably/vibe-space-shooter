@@ -25,7 +25,7 @@ class PlayerIdleState implements State {
   public readonly name = PlayerState.IDLE;
 
   public enter(owner: StateMachine): void {
-    // Nothing to do
+    console.log('Entering player idle state');
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
@@ -39,19 +39,21 @@ class PlayerIdleState implements State {
       inputManager.isArrowLeftPressed() ||
       inputManager.isArrowRightPressed()
     ) {
+      console.log('Movement keys detected in idle state, transitioning to moving state');
       owner.setState(PlayerState.MOVING);
       return;
     }
 
     // Transition to shooting state if space is pressed
     if (inputManager.isSpacePressed()) {
+      console.log('Space key detected in idle state, transitioning to shooting state');
       owner.setState(PlayerState.SHOOTING);
       return;
     }
   }
 
   public exit(owner: StateMachine): void {
-    // Nothing to do
+    console.log('Exiting player idle state');
   }
 }
 
@@ -62,7 +64,7 @@ class PlayerMovingState implements State {
   public readonly name = PlayerState.MOVING;
 
   public enter(owner: StateMachine): void {
-    // Nothing to do
+    console.log('Entering player moving state');
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
@@ -75,19 +77,24 @@ class PlayerMovingState implements State {
 
     if (inputManager.isArrowUpPressed()) {
       dy -= player.speed * deltaTime;
+      console.log('Up key pressed, moving up', dy);
     }
     if (inputManager.isArrowDownPressed()) {
       dy += player.speed * deltaTime;
+      console.log('Down key pressed, moving down', dy);
     }
     if (inputManager.isArrowLeftPressed()) {
       dx -= player.speed * deltaTime;
+      console.log('Left key pressed, moving left', dx);
     }
     if (inputManager.isArrowRightPressed()) {
       dx += player.speed * deltaTime;
+      console.log('Right key pressed, moving right', dx);
     }
 
     // Move the player
     if (dx !== 0 || dy !== 0) {
+      console.log(`Moving player by dx=${dx}, dy=${dy}`);
       player.move(dx, dy);
     } else {
       // Transition back to idle state if no movement keys are pressed
@@ -103,7 +110,7 @@ class PlayerMovingState implements State {
   }
 
   public exit(owner: StateMachine): void {
-    // Nothing to do
+    console.log('Exiting player moving state');
   }
 }
 
@@ -257,9 +264,9 @@ export class PlayerShip extends Entity {
   public readonly maxHealth: number = 100;
 
   /**
-   * Movement speed
+   * Player speed
    */
-  public readonly speed: number = 5;
+  public readonly speed: number = 3.0;
 
   /**
    * Shoot cooldown in frames
@@ -345,6 +352,8 @@ export class PlayerShip extends Entity {
    * Initialize states
    */
   protected initializeStates(): void {
+    console.log('Initializing player ship states');
+    
     // Add states to the state machine
     this.stateMachine.addState(new PlayerIdleState());
     this.stateMachine.addState(new PlayerMovingState());
@@ -354,6 +363,7 @@ export class PlayerShip extends Entity {
 
     // Set initial state
     this.stateMachine.setState(PlayerState.IDLE);
+    console.log('Player initial state set to IDLE');
   }
 
   /**

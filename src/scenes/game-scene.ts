@@ -32,17 +32,17 @@ export class GameScene extends Scene {
   /**
    * Enemy spawn interval in seconds
    */
-  private enemySpawnInterval: number = 2;
+  private enemySpawnInterval: number = 3;
   
   /**
    * Min spawn interval
    */
-  private minSpawnInterval: number = 0.5;
+  private minSpawnInterval: number = 1.5;
   
   /**
    * Spawn interval decrease rate
    */
-  private spawnIntervalDecreaseRate: number = 0.02;
+  private spawnIntervalDecreaseRate: number = 0.01;
   
   /**
    * Game time in seconds
@@ -400,20 +400,54 @@ export class GameScene extends Scene {
     // Random x position
     const x = Math.random() * (this.screenWidth - 100) + 50;
     
+    // Estimate enemy height after scaling (original height * scale factor)
+    // Enemy sprites are approx 75px tall with 0.6 scale = ~45px rendered height
+    const estimatedEnemyHeight = 45;
+    const minVerticalSpacing = estimatedEnemyHeight * 1.5; // At least 1.5x height spacing
+    
+    // Get positions of all active enemies currently above the screen
+    const activeEnemyPositions = this.enemies
+      .filter(enemy => enemy.isActive() && enemy.getY() < 0)
+      .map(enemy => enemy.getY());
+    
+    // Start with a random position between -50 and -800
+    let y = -50 - Math.random() * 750;
+    
+    // Check if this position is too close to any existing enemy
+    // If so, move it further up to maintain minimum spacing
+    let attemptsLeft = 10; // Limit attempts to prevent infinite loops
+    while (attemptsLeft > 0) {
+      const tooClose = activeEnemyPositions.some(
+        enemyY => Math.abs(enemyY - y) < minVerticalSpacing
+      );
+      
+      if (!tooClose) {
+        break; // Position is good, no conflicts
+      }
+      
+      // Move further up by the minimum spacing + random offset
+      y -= minVerticalSpacing + Math.random() * 50;
+      attemptsLeft--;
+    }
+    
+    console.log(`Spawning enemy at y=${y} with vertical spacing of ${minVerticalSpacing}px`);
+    
     // Random enemy type
     const enemyTypes = [EnemyType.TYPE_1, EnemyType.TYPE_2, EnemyType.TYPE_3];
     const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
     
-    console.log(`Attempting to spawn enemy type: ${randomType} at x: ${x}`);
-    
     // Create enemy
     const enemy = new EnemyShip(
       x,
-      -50, // Start above screen
+      y, // Staggered start position above screen
       randomType,
       this.screenWidth,
       this.screenHeight
     );
+    
+    // Vary the vertical speed dramatically
+    const verticalSpeed = 0.3 + Math.random() * 1.7; // Between 0.3 and 2.0 speed
+    enemy.setVerticalSpeed(verticalSpeed);
     
     // Debug: Log available textures
     console.log('Available textures:', AssetLoader.getInstance().listTextures());
@@ -475,7 +509,7 @@ export class GameScene extends Scene {
     
     // Reset enemy spawn timer and interval
     this.enemySpawnTimer = 0;
-    this.enemySpawnInterval = 2;
+    this.enemySpawnInterval = 3;
     
     // Clear all enemies
     for (const enemy of this.enemies) {

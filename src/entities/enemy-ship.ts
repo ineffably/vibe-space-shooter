@@ -178,7 +178,7 @@ class EnemyDestroyedState implements State {
  */
 export class EnemyShip extends Entity {
   /**
-   * Enemy type
+   * Type of enemy
    */
   private type: EnemyType;
   
@@ -224,6 +224,26 @@ export class EnemyShip extends Entity {
   private activeProjectiles: Projectile[] = [];
   
   /**
+   * Movement phase for horizontal movement
+   */
+  private movementPhase: number = 0;
+  
+  /**
+   * Movement amplitude for horizontal movement
+   */
+  private movementAmplitude: number = 50;
+  
+  /**
+   * Movement frequency for horizontal movement
+   */
+  private movementFrequency: number = 0.8;
+  
+  /**
+   * Initial spawn X position for centered movement
+   */
+  private spawnX: number = 0;
+  
+  /**
    * Constructor
    * @param x Initial x position
    * @param y Initial y position
@@ -237,6 +257,12 @@ export class EnemyShip extends Entity {
     this.type = type;
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
+    this.spawnX = x; // Store initial x position
+    
+    // Initialize movement properties with more moderate values
+    this.movementPhase = Math.random() * Math.PI * 2; // Random starting phase
+    this.movementAmplitude = 20 + Math.random() * 30; // Reduced range: 20-50 pixels (was 30-80)
+    this.movementFrequency = 0.3 + Math.random() * 0.5; // Reduced range: 0.3-0.8 (was 0.5-1.5)
     
     // Set minimum shoot cooldown to 0.5 seconds (500ms) as per the spec
     // Add some randomness so enemies don't all shoot at the same time
@@ -327,20 +353,37 @@ export class EnemyShip extends Entity {
     // Move down
     this.y += this.verticalSpeed * deltaTime;
     
-    // Move horizontally with random direction changes
-    if (Math.random() < 0.005) {
-      this.horizontalDirection *= -1;
-    }
+    // Horizontal movement with easing
+    // Instead of changing direction randomly, use a sine wave pattern
+    // This creates a smooth side-to-side motion
     
-    this.x += this.horizontalDirection * this.speed * deltaTime;
+    // Update movement phase
+    this.movementPhase += this.movementFrequency * deltaTime * 0.1;
+    
+    // Calculate new x position using sine wave
+    const centerX = this.spawnX;
+    const offsetX = Math.sin(this.movementPhase) * this.movementAmplitude;
+    const targetX = centerX + offsetX;
+    
+    // Calculate the horizontal movement delta
+    const deltaX = targetX - this.x;
+    
+    // Cap the horizontal movement speed to a maximum value
+    const maxHorizontalSpeed = 1.0 * deltaTime;
+    const cappedDeltaX = Math.sign(deltaX) * Math.min(Math.abs(deltaX), maxHorizontalSpeed);
+    
+    // Apply the capped movement
+    this.x += cappedDeltaX;
     
     // Keep within screen bounds
     if (this.x < 30) {
       this.x = 30;
-      this.horizontalDirection = 1;
+      // Reverse direction by adjusting phase
+      this.movementPhase = Math.PI - this.movementPhase;
     } else if (this.x > this.screenWidth - 30) {
       this.x = this.screenWidth - 30;
-      this.horizontalDirection = -1;
+      // Reverse direction by adjusting phase
+      this.movementPhase = Math.PI - this.movementPhase;
     }
     
     // Update container position

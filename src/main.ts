@@ -1,5 +1,7 @@
 import './style.css'
-import { Game } from './core/game.ts'
+import { Game } from './core/game'
+
+(window as any).__isLoaded = true;
 
 // Create a new game instance
-const game = new Game()
+new Game()

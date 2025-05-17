@@ -125,13 +125,13 @@ export class InputManager {
     });
     
     // Mouse down event listener
-    window.addEventListener('mousedown', (event: MouseEvent) => {
+    window.addEventListener('mousedown', (_event: MouseEvent) => {
       this.mouseState.pressed = true;
       this.mouseState.justPressed = true;
     });
     
     // Mouse up event listener
-    window.addEventListener('mouseup', (event: MouseEvent) => {
+    window.addEventListener('mouseup', (_event: MouseEvent) => {
       this.mouseState.pressed = false;
       this.mouseState.justPressed = false;
       this.mouseState.justReleased = true;

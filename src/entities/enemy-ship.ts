@@ -1,4 +1,3 @@
-import { Sprite, Texture } from 'pixi.js';
 import { Entity } from './entity';
 import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
@@ -33,18 +32,18 @@ enum EnemyState {
 class EnemyIdleState implements State {
   public readonly name = EnemyState.IDLE;
   
-  public enter(owner: StateMachine): void {
+  public enter(_owner: StateMachine): void {
     // Nothing to do
   }
   
-  public update(owner: StateMachine, deltaTime: number): void {
+  public update(owner: StateMachine, _deltaTime: number): void {
     // Transition to moving after a short delay
     setTimeout(() => {
       owner.setState(EnemyState.MOVING);
     }, 500);
   }
   
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -55,7 +54,7 @@ class EnemyIdleState implements State {
 class EnemyMovingState implements State {
   public readonly name = EnemyState.MOVING;
   
-  public enter(owner: StateMachine): void {
+  public enter(_owner: StateMachine): void {
     // Nothing to do
   }
   
@@ -64,7 +63,7 @@ class EnemyMovingState implements State {
     enemy.move(deltaTime);
   }
   
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -77,7 +76,7 @@ class EnemyShootingState implements State {
   private shootingTimer = 0;
   private readonly shootingTime = 0.3; // Time for shooting animation
   
-  public enter(owner: StateMachine): void {
+  public enter(_owner: StateMachine): void {
     this.shootingTimer = 0;
   }
   
@@ -90,7 +89,7 @@ class EnemyShootingState implements State {
     }
   }
   
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -126,7 +125,7 @@ class EnemyDamagedState implements State {
     }
   }
   
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -160,7 +159,7 @@ class EnemyDestroyedState implements State {
     console.log(`Enemy ${enemy.getType()} destroyed with explosion animation!`);
   }
   
-  public update(owner: StateMachine, deltaTime: number): void {
+  public update(_owner: StateMachine, deltaTime: number): void {
     this.destroyedTimer += deltaTime;
     
     // After destroyed animation time, enemy stays destroyed
@@ -169,7 +168,7 @@ class EnemyDestroyedState implements State {
     }
   }
   
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -189,12 +188,12 @@ export class EnemyShip extends Entity {
   private health: number = 100;
   
   /**
-   * Movement speed
+   * Movement speed (used in move method)
    */
   private speed: number = 2;
   
   /**
-   * Horizontal movement direction (1 = right, -1 = left)
+   * Horizontal movement direction (1 = right, -1 = left, used in wave movement)
    */
   private horizontalDirection: number = 0;
   

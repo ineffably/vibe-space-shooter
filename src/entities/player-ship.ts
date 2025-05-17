@@ -1,4 +1,3 @@
-import { Texture } from 'pixi.js';
 import { Entity } from './entity';
 import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
@@ -26,10 +25,10 @@ enum PlayerState {
 class PlayerIdleState implements State {
   public readonly name = PlayerState.IDLE;
 
-  public enter(owner: StateMachine): void {
+  public enter(_owner: StateMachine): void {
   }
 
-  public update(owner: StateMachine, deltaTime: number): void {
+  public update(owner: StateMachine, _deltaTime: number): void {
     const player = owner.getOwner() as PlayerShip;
     const inputManager = InputManager.getInstance();
 
@@ -51,7 +50,7 @@ class PlayerIdleState implements State {
     }
   }
 
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
   }
 }
 
@@ -61,7 +60,7 @@ class PlayerIdleState implements State {
 class PlayerMovingState implements State {
   public readonly name = PlayerState.MOVING;
 
-  public enter(owner: StateMachine): void {
+  public enter(_owner: StateMachine): void {
   }
 
   public update(owner: StateMachine, deltaTime: number): void {
@@ -101,7 +100,7 @@ class PlayerMovingState implements State {
     }
   }
 
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
   }
 }
 
@@ -161,7 +160,7 @@ class PlayerShootingState implements State {
     }
   }
 
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -190,8 +189,8 @@ class PlayerDamagedState implements State {
     }
   }
 
-  public exit(owner: StateMachine): void {
-    const player = owner.getOwner() as PlayerShip;
+  public exit(_owner: StateMachine): void {
+    const player = _owner.getOwner() as PlayerShip;
     // Reset visual indication
     player.setDamageVisual(false);
   }
@@ -251,8 +250,8 @@ class PlayerDestroyedState implements State {
     }
   }
 
-  public exit(owner: StateMachine): void {
-    const player = owner.getOwner() as PlayerShip;
+  public exit(_owner: StateMachine): void {
+    const player = _owner.getOwner() as PlayerShip;
     player.setActive(true);
     player.setVisibility(true);
   }
@@ -335,8 +334,8 @@ class PlayerInvulnerableState implements State {
     }
   }
 
-  public exit(owner: StateMachine): void {
-    const player = owner.getOwner() as PlayerShip;
+  public exit(_owner: StateMachine): void {
+    const player = _owner.getOwner() as PlayerShip;
     player.setVisibility(true);
   }
 }

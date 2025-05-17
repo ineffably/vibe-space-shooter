@@ -68,7 +68,7 @@ export class SoundManager {
         onload: () => {
           resolve();
         },
-        onloaderror: (id, message) => {
+        onloaderror: (_id, message) => {
           reject(new Error(`Failed to load sound: ${config.key} - ${message}`));
         }
       });

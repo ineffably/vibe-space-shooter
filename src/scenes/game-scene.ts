@@ -1,4 +1,4 @@
-import { Container, Sprite, Texture, Text } from 'pixi.js';
+import { Container, Sprite, Text } from 'pixi.js';
 import { Scene } from './scene';
 import { InputManager } from '../core/input-manager';
 import { PlayerShip } from '../entities/player-ship';

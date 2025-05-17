@@ -1,4 +1,4 @@
-import { Application, Assets, Ticker } from 'pixi.js';
+import { Application, Ticker } from 'pixi.js';
 import { SceneManager } from './scene-manager';
 import { GameScene } from '../scenes/game-scene';
 import { AssetLoader } from '../library/asset-loader';

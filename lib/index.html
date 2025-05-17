@@ -1,11 +1,4 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pixi Space Shooter</title>
-    <style>
-      body {
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Pixi Space Shooter</title><style>body {
         margin: 0;
         padding: 0;
         overflow: hidden;
@@ -26,24 +19,11 @@
       canvas {
         display: block;
         margin: 0 auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="game-container"></div>
-    
-    <!-- This script tag will be used by Vite in dev mode -->
-    <!-- It will be removed/replaced by HtmlWebpackPlugin in production -->
-    <script type="module" src="/src/main.ts"></script>
-    <script>
-      window.addEventListener('load', () => {
+      }</style><script defer="defer" src="bundle.js"></script></head><body><div id="game-container"></div><script type="module" src="/src/main.ts"></script><script>window.addEventListener('load', () => {
         if (!window.__isLoaded) {
           console.log('== bundle not loaded. attempting manual bundle ==');
           const script = document.createElement('script');
           script.src = './lib/bundle.js'; // set static in webpack dev server to root 
           document.body.appendChild(script);
         }
-      })
-    </script>    
-  </body>
-</html>
+      })</script></body></html>

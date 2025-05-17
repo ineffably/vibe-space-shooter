@@ -2,18 +2,41 @@
   "name": "pixi-space-shooter",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "main": "lib/bundle.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build:vite": "tsc && vite build",
+    "build": "webpack --config webpack.config.js",
+    "preview": "vite preview",
+    "build:webpack:dev": "webpack --config webpack.config.js --mode=development",
+    "dev:webpack": "webpack serve --mode=development --config webpack.config.js"
   },
+  "author": "Chad Neff <ccneff@gmail.com> (https://github.com/ineffably)",
+  "license": "MIT",
+  "type": "commonjs",
+  "description": "A simple, feature-rich, and easy-to-use space shooter game written in TypeScript using PIXI.js 100% vibe coded with agents and love.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ineffably/vibe-space-shooter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ineffably/vibe-space-shooter/issues"
+  },
+  "homepage": "https://github.com/ineffably/rad-gui#readme",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^7.1.2",
     "eslint": "^9.27.0",
+    "html-webpack-plugin": "^5.6.3",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "webpack": "^5.99.8",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
     "@types/howler": "^2.2.12",

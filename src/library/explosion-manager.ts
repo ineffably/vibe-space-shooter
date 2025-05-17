@@ -1,4 +1,4 @@
-import { Container, Sprite, Texture, AnimatedSprite } from 'pixi.js';
+import { Container, Texture, AnimatedSprite } from 'pixi.js';
 import { AssetLoader } from './asset-loader';
 import { SoundManager, SoundType } from './sound-manager';
 

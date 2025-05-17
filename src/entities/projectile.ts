@@ -1,4 +1,3 @@
-import { Texture } from 'pixi.js';
 import { Entity } from './entity';
 import { StateMachine } from '../states/state-machine';
 import type { State } from '../states/state-machine';
@@ -45,7 +44,7 @@ class ProjectileActiveState implements State {
     }
   }
 
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -86,7 +85,7 @@ class ProjectileExplodingState implements State {
     }
   }
   
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
@@ -103,11 +102,11 @@ class ProjectileInactiveState implements State {
     projectile.returnToPool();
   }
   
-  public update(owner: StateMachine, deltaTime: number): void {
+  public update(_owner: StateMachine, _deltaTime: number): void {
     // Nothing to do while inactive
   }
   
-  public exit(owner: StateMachine): void {
+  public exit(_owner: StateMachine): void {
     // Nothing to do
   }
 }
